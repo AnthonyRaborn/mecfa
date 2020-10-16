@@ -1,0 +1,25 @@
+Package: mecfa
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Who wrote it
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL
+Encoding: UTF-8
+LazyData: TRUE
+RoxygenNote: 7.1.1
+Suggests:
+    knitr,
+    rmarkdown
+Imports:
+    lavaan (>= 0.5-22),
+    ggplot2,
+    tidyr,
+    stringr,
+    doSNOW,
+    foreach,
+    methods
+Depends:
+    R (>= 3.0.0)

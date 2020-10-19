@@ -89,10 +89,10 @@ test <-
   exploratorySA(initialModels = initialModels,
                 originalData = initialData,
                 maxSteps = 6000,
-                fitStatistic = 'cfi',
-                maximize = T,
+                fitStatistic = 'bic',
+                maximize = F,
                 lavaan.model.specs = lavaanDesc)
-print(modelTableToString(bestECFA(test)))
+print(modelTableToString(bestECFA(test, F)))
 
 # lavaan::fitmeasures(test[[3]]@best_model)
 # lavaan::summary(test[[3]]@best_model)

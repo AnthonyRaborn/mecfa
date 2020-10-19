@@ -5,14 +5,18 @@
 #' @export
 #'
 bestECFA <-
-  function(object) {
+  function(object, max = TRUE) {
     all_final_fit <-
       c()
     for (i in 1:(length(object)-1)) {
       all_final_fit[i] <-
         object[[i]]@best_fit
     }
-    object[[which(all_final_fit==max(all_final_fit))]]
+    if (max) {
+      object[[which(all_final_fit==max(all_final_fit))]]
+    } else {
+      object[[which(all_final_fit==min(all_final_fit))]]
+    }
   }
 
 #' Print the model in string format

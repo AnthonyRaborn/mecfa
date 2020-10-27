@@ -4,10 +4,10 @@
 \alias{modelTableToString}
 \title{Print the model in string format}
 \usage{
-modelTableToString(object)
+modelTableToString(model)
 }
 \arguments{
-\item{object}{A fit MECFA list.}
+\item{model}{A fit MECFA list.}
 }
 \description{
 Print the model in string format

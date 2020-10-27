@@ -85,15 +85,20 @@ lavaanDesc <-
        auto.th = TRUE,
        auto.delta = TRUE,
        auto.cov.y = TRUE)
-test <-
+testMax <-
   exploratorySA(initialModels = initialModels,
                 originalData = initialData,
-                maxSteps = 6000,
-                fitStatistic = 'bic',
+                maxSteps = 1000,
+                fitStatistic = 'cfi',
+                lavaan.model.specs = lavaanDesc)
+
+testMin <-
+  exploratorySA(initialModels = initialModels,
+                originalData = initialData,
+                maxSteps = 1000,
+                fitStatistic = 'chisq',
                 maximize = F,
                 lavaan.model.specs = lavaanDesc)
-print(modelTableToString(bestECFA(test, F)))
-
-# lavaan::fitmeasures(test[[3]]@best_model)
-# lavaan::summary(test[[3]]@best_model)
-
+testMax
+testMin
+print(modelTableToString(bestECFA(testMax)))

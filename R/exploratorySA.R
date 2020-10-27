@@ -1,3 +1,84 @@
+#' An S4 class for exploratorySA
+#'
+#' @slot totalTime A `difftime` object of the total time it took to run the algorithm.
+#' @slot functionCall The  `match.call` arguments used to run the algorithm.
+#' @slot modelResults A `list` of model results of class `ecfaSA`.
+setClass("exploratorySA",
+         slots =
+           list(
+             totalTime = 'ANY',
+             functionCall = 'call',
+             modelResults = 'list'
+           )
+)
+
+#' Print method for class `exploratorySA`
+#'
+#' @param object An S4 object of class `exploratorySA`.
+#'
+#' @export
+setMethod('show',
+          signature = 'exploratorySA',
+          definition = function(object) {
+            max <-
+              ifelse(
+                is.null(
+                  object@functionCall$maximize
+                  ),
+                TRUE, as.logical(
+                  as.character(
+                    object@functionCall$maximize
+                    )
+                )
+                )
+
+            result <-
+              bestECFA(object, max)
+
+            if (is.data.frame(result@best_syntax)) {
+              model.syntax <-
+                modelTableToString(result)
+            } else (model.syntax = result@best_syntax)
+
+            line0 = paste0("ECFA Algorithm: Simulated Annealing")
+            line1 = paste0(
+              "Total Run Time: ",
+              round(object@totalTime[[1]], 3),
+              " ",
+              attr(object@totalTime, "units")
+            )
+            line2 = suppressWarnings(
+              stringr::str_wrap(
+                as.vector(c("ECFA Function Call:\n", object@functionCall, "\n")),
+                exdent = 2
+              )
+            )
+            line3 = suppressWarnings(
+              stringr::str_wrap(
+                as.vector(c("Best Model Function Call:\n", result@function_call, "\n")),
+                exdent = 2
+              )
+            )
+            line4 = paste0(
+              stringr::str_wrap(
+                c("Final Model Syntax:\n",
+                  # lavExport(result@best_model, export = F)[1])
+                  unlist(strsplit(model.syntax, '\n'))),
+                exdent = 2),
+              collapse = "\n"
+            )
+            line5 = paste0(
+              "Best Model Fit Using ",
+              names(result@best_fit),
+              ": ",
+              round(result@best_fit, 3)
+            )
+            to_console = paste0(c(line0, line1, line2, line3, line4, line5),
+                                collapse = "\n")
+            cat(to_console)
+          }
+)
+
 #' Exploratory CFA using Simulated Annealing
 #'
 #' @param initialModels The initial model as a `character` vector with lavaan model syntax. Each starting model should be its own element in the vector.
@@ -143,7 +224,12 @@ exploratorySA <-
       parallel::stopCluster(cl)
     }
 
-    chainResults$totalTime <-
-      Sys.time()-startTime
-    chainResults
-  }
+    results <-
+      new('exploratorySA',
+          totalTime = Sys.time()-startTime,
+          functionCall = match.call(),
+          modelResults = chainResults
+      )
+    results
+    }
+

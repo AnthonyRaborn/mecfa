@@ -79,6 +79,21 @@ setMethod('show',
           }
 )
 
+#' Summary method for S4 object `exploratorySA`
+#'
+#' @param object An S4 object of class `exploratorySA`
+#'
+#' export
+setMethod('summary',
+          signature = 'exploratorySA',
+          definition = function(object) {
+            result <-
+              bestECFA(object)
+
+            lavaan::summary(result@best_model)
+          }
+          )
+
 #' Exploratory CFA using Simulated Annealing
 #'
 #' @param initialModels The initial model as a `character` vector with lavaan model syntax. Each starting model should be its own element in the vector.

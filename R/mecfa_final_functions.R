@@ -1,12 +1,23 @@
 #' Pick the best-fit ECFA model(s)
 #'
 #' @param object A fit MECFA list.
-#' @param max Was the objective function maximized (`TRUE`)?
 #'
 #' @export
 #'
 bestECFA <-
-  function(object, max = TRUE) {
+  function(object) {
+    max <-
+      ifelse(
+        is.null(
+          object@functionCall$maximize
+        ),
+        TRUE, as.logical(
+          as.character(
+            object@functionCall$maximize
+          )
+        )
+      )
+
     all_final_fit <-
       c()
     results <-

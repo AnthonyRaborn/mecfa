@@ -4,12 +4,10 @@
 \alias{bestECFA}
 \title{Pick the best-fit ECFA model(s)}
 \usage{
-bestECFA(object, max = TRUE)
+bestECFA(object)
 }
 \arguments{
 \item{object}{A fit MECFA list.}
-
-\item{max}{Was the objective function maximized (`TRUE`)?}
 }
 \description{
 Pick the best-fit ECFA model(s)

@@ -20,20 +20,8 @@ setClass("exploratorySA",
 setMethod('show',
           signature = 'exploratorySA',
           definition = function(object) {
-            max <-
-              ifelse(
-                is.null(
-                  object@functionCall$maximize
-                  ),
-                TRUE, as.logical(
-                  as.character(
-                    object@functionCall$maximize
-                    )
-                )
-                )
-
             result <-
-              bestECFA(object, max)
+              bestECFA(object)
 
             if (is.data.frame(result@best_syntax)) {
               model.syntax <-
@@ -62,7 +50,6 @@ setMethod('show',
             line4 = paste0(
               stringr::str_wrap(
                 c("Final Model Syntax:\n",
-                  # lavExport(result@best_model, export = F)[1])
                   unlist(strsplit(model.syntax, '\n'))),
                 exdent = 2),
               collapse = "\n"

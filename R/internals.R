@@ -40,18 +40,17 @@ randomInitialModel <-
     if (bifactorModel == TRUE) {
       # if bifactorModel == TRUE, fix the items so the newItems all load on the bifactor
       # assumes that the bifactor latent variable is the last one
-      newItemsPerFactor[[length(itemsPerFactor)]] <- unlist(newItemsPerFactor[1:(length(itemsPerFactor) - 1)])
+      newItemsPerFactor[[length(itemsPerFactor)]] <-
+        unlist(newItemsPerFactor[1:(length(itemsPerFactor) - 1)])
     }
 
     # create the new model syntax
 
     newModelSyntax <- c()
     for (i in 1:length(factors)) {
-      newModelSyntax[i] <- paste(
-        factors[i],
-        "=~",
-        paste(newItemsPerFactor[[i]], collapse = " + ")
-      )
+      newModelSyntax[i] <- paste(factors[i],
+                                 "=~",
+                                 paste(newItemsPerFactor[[i]], collapse = " + "))
     }
     newModelSyntax <-
       paste0(newModelSyntax, externalRelation, factorRelation, collapse = "\n")
@@ -91,7 +90,6 @@ randomNeighborShort <-
            bifactor = FALSE,
            init.model,
            lavaan.model.specs) {
-
     mapply(
       assign,
       c("factors", "itemsPerFactor"),
@@ -123,8 +121,7 @@ randomNeighborShort <-
 
     replacePattern <- paste0("\\b",
                              paste0(allItems,
-                                    collapse = "\\b|\\b"
-                             ),
+                                    collapse = "\\b|\\b"),
                              "\\b")
 
     replacementItemPool <- c()
@@ -155,9 +152,11 @@ randomNeighborShort <-
       }
       changingItems <- c(changingItems, changingItemTemp)
       # Sample an item from the items in the item pool
-      tempReplacementItems <- sample(replacementItemPool[[currentFactor]], 1)
+      tempReplacementItems <-
+        sample(replacementItemPool[[currentFactor]], 1)
       while (tempReplacementItems %in% replacementItem) {
-        tempReplacementItems <- sample(replacementItemPool[[currentFactor]], 1)
+        tempReplacementItems <-
+          sample(replacementItemPool[[currentFactor]], 1)
       }
       replacementItem <- c(replacementItem, tempReplacementItems)
     }
@@ -176,21 +175,18 @@ randomNeighborShort <-
     if (bifactor == TRUE) {
       # if bifactor == TRUE, fix the items so the newItems all load on the bifactor
       # assumes that the bifactor latent variable is the last one
-      currentItems[[length(itemsPerFactor)]] <- unlist(currentItems[1:(length(itemsPerFactor) - 1)])
+      currentItems[[length(itemsPerFactor)]] <-
+        unlist(currentItems[1:(length(itemsPerFactor) - 1)])
     }
 
     # create the new model syntax
-    newModelSyntax <- as.vector(
-      stringr::str_split(currentModelObject$model.syntax,
-                         "\n",
-                         simplify = T)
-    )
+    newModelSyntax <- as.vector(stringr::str_split(currentModelObject$model.syntax,
+                                                   "\n",
+                                                   simplify = T))
     for (i in 1:length(factors)) {
-      newModelSyntax[i] <- paste(
-        factors[i],
-        "=~",
-        paste(currentItems[[i]], collapse = " + ")
-      )
+      newModelSyntax[i] <- paste(factors[i],
+                                 "=~",
+                                 paste(currentItems[[i]], collapse = " + "))
     }
 
     newModelSyntax <- stringr::str_flatten(newModelSyntax,
@@ -238,54 +234,52 @@ randomNeighborFull <-
     latentVariables <-
       row.names(lavaan::inspect(currentModelObject, "cor.lv"))
     currentModelParamsLV <-
-      paramTable[paramTable$lhs %in% latentVariables & paramTable$op=="=~", ]
+      paramTable[paramTable$lhs %in% latentVariables &
+                   paramTable$op == "=~",]
 
     # randomly select rows to make changes to
     randomChangesRows <-
       sample(currentModelParamsLV$id, size = numChanges)
-    changeParamTable <- paramTable[randomChangesRows, ]
+    changeParamTable <- paramTable[randomChangesRows,]
 
     # make the changes by shifting rhs up one row (overflow to bottom)
     paramTable$rhs[randomChangesRows] <-
-      paramTable$rhs[randomChangesRows][c(2:numChanges,1)]
+      paramTable$rhs[randomChangesRows][c(2:numChanges, 1)]
 
     # flip a coin to decide if a lhs should change
     # choose only from t
     # randomLHS <-
     #   sample(x = c(T,F), 1)
     # if (randomLHS) {
-      # whichPossibleLHS <-
-      #   table(currentModelParamsLV$lhs)
-      #
-      # whichPossibleLHS <-
-      #   names(which(whichPossibleLHS > 3))
-      # whichLHSrows <-
-      #   currentModelParamsLV$id[currentModelParamsLV$lhs %in% whichPossibleLHS]
-      # # randomly select rows to make changes to
-      # randomChangesRows <-
-      #   sample(whichLHSrows, size = numChanges)
-      # changeParamTable <- paramTable[randomChangesRows, ]
-      #
-      # # make the changes by shifting rhs up one row (overflow to bottom)
-      # paramTable$lhs[randomChangesRows] <-
-      #   paramTable$lhs[randomChangesRows][c(2:numChanges,1)]
+    # whichPossibleLHS <-
+    #   table(currentModelParamsLV$lhs)
+    #
+    # whichPossibleLHS <-
+    #   names(which(whichPossibleLHS > 3))
+    # whichLHSrows <-
+    #   currentModelParamsLV$id[currentModelParamsLV$lhs %in% whichPossibleLHS]
+    # # randomly select rows to make changes to
+    # randomChangesRows <-
+    #   sample(whichLHSrows, size = numChanges)
+    # changeParamTable <- paramTable[randomChangesRows, ]
+    #
+    # # make the changes by shifting rhs up one row (overflow to bottom)
+    # paramTable$lhs[randomChangesRows] <-
+    #   paramTable$lhs[randomChangesRows][c(2:numChanges,1)]
 
     # }
 
     # flip a coin to decide if an item should be added to a 3-item
     currentModelParamsLV <-
-      paramTable[paramTable$lhs %in% latentVariables & paramTable$op=="=~", ]
+      paramTable[paramTable$lhs %in% latentVariables &
+                   paramTable$op == "=~",]
     if (any(table(currentModelParamsLV$lhs) > 3) &
         # any(table(currentModelParamsLV$lhs) == 3) &
-        sample(x = c(T,T,F), 1)) {
-
+        sample(x = c(T, T, F), 1)) {
       whichAddTo <-
-        sample(
-          names(
-            which(
-              table(currentModelParamsLV$lhs) >= 3)
-            ), 1
-        )
+        sample(names(which(table(
+          currentModelParamsLV$lhs
+        ) >= 3)), 1)
       whichAddFrom <-
         names(which(table(currentModelParamsLV$lhs) > 3))
       whichAddFromRow <-
@@ -298,9 +292,9 @@ randomNeighborFull <-
     }
 
     paramTable <-
-      paramTable[order(-xtfrm(paramTable[,'op']),
-                       paramTable[,'lhs'],
-                       paramTable[,'rhs']),]
+      paramTable[order(-xtfrm(paramTable[, 'op']),
+                       paramTable[, 'lhs'],
+                       paramTable[, 'rhs']), ]
 
     # remove the starting value, estimates, and standard errors of the currentModel
     paramTable$est <- NULL
@@ -313,46 +307,42 @@ randomNeighborFull <-
     prevModel$model <- paramTable
     # randomNeighborModel <- try(do.call(eval(parse(text = "lavaan::lavaan")), prevModel[-1]), silent = TRUE)
 
-    randomNeighborModel <- modelWarningCheck(
-      lavaan::lavaan(
-        model = prevModel$model,
-        data = data
-      ),
-      modelSyntax = prevModel$model
-    )
+    randomNeighborModel <- modelWarningCheck(lavaan::lavaan(model = prevModel$model,
+                                                            data = data),
+                                             modelSyntax = prevModel$model)
 
     return(randomNeighborModel)
   }
 
-goal <- function(x, fitStatistic = "cfi", maximize) {
-  # if using lavaan and a singular fit statistic,
-  if (class(x) == "lavaan" & is.character(fitStatistic) & length(fitStatistic) == 1) {
-    energy <- fitWarningCheck(
-      lavaan::fitMeasures(x, fit.measures = fitStatistic),
-      maximize
-    )
+goal <-
+  function(x, fitStatistic = "cfi", maximize) {
+    # if using lavaan and a singular fit statistic,
+    if (class(x) == "lavaan" &
+        is.character(fitStatistic) & length(fitStatistic) == 1) {
+      energy <- fitWarningCheck(lavaan::fitMeasures(x, fit.measures = fitStatistic),
+                                maximize)
 
-    if (is.na(energy) & maximize == TRUE) {
-      energy = -Inf
-    } else if (is.na(energy)) {
-      energy = Inf
-    }
+      if (is.na(energy) & maximize == TRUE) {
+        energy = -Inf
+      } else if (is.na(energy)) {
+        energy = Inf
+      }
 
-    if (maximize == TRUE) {
-      return(-energy)
-    } else {
-      return(energy)
-    }
-  } else {
-    if (class(x) == "NULL") {
       if (maximize == TRUE) {
-        return(-Inf)
+        return(-energy)
       } else {
-        return(Inf)
+        return(energy)
+      }
+    } else {
+      if (class(x) == "NULL") {
+        if (maximize == TRUE) {
+          return(-Inf)
+        } else {
+          return(Inf)
+        }
       }
     }
   }
-}
 
 selectionFunction <-
   function(currentModelObject = currentModel,
@@ -361,7 +351,6 @@ selectionFunction <-
            maximize,
            fitStatistic,
            consecutive) {
-
     # check that the models aren't null
     if (is.null(currentModelObject$model.output)) {
       return(randomNeighborModel)
@@ -388,21 +377,27 @@ selectionFunction <-
     # this is the Kirkpatrick et al. method of selecting between currentModel and randomNeighborModel
     if (goal(randomNeighborModel$model.output, fitStatistic, maximize) < goal(currentModelObject$model.output, fitStatistic, maximize)) {
       # consecutive <- consecutive + 1
-      cat(
-        paste0(
-          "\rOld Fit: ", round(as.numeric(lavaan::fitmeasures(object = currentModelObject$model.output,
-                                                              fit.measures = fitStatistic)), 3),
-          " New Fit: ", round(as.numeric(lavaan::fitmeasures(object = randomNeighborModel$model.output,
-                                                             fit.measures = fitStatistic)), 3),
-          "                                                                    "))
+      cat(paste0(
+        "\rOld Fit: ",
+        round(as.numeric(
+          lavaan::fitmeasures(object = currentModelObject$model.output,
+                              fit.measures = fitStatistic)
+        ), 3),
+        " New Fit: ",
+        round(as.numeric(
+          lavaan::fitmeasures(object = randomNeighborModel$model.output,
+                              fit.measures = fitStatistic)
+        ), 3),
+        "                                                                    "
+      ))
       return(randomNeighborModel)
     } else {
-      probability <- exp(
-        -(goal(randomNeighborModel$model.output, fitStatistic, maximize) - goal(currentModelObject$model.output, fitStatistic, maximize)
-        ) / currentTemp
-      )
+      probability <- exp(-(
+        goal(randomNeighborModel$model.output, fitStatistic, maximize) - goal(currentModelObject$model.output, fitStatistic, maximize)
+      ) / currentTemp)
 
-      if (is.nan(probability)) probability = 0
+      if (is.nan(probability))
+        probability = 0
 
       if (probability > stats::runif(1)) {
         newModel <- randomNeighborModel
@@ -410,21 +405,26 @@ selectionFunction <-
         newModel <- currentModelObject
       }
 
-      consecutive <- ifelse(
-        identical(
-          lavaan::parameterTable(newModel$model.output),
-          lavaan::parameterTable(currentModelObject$model.output)
-        ),
-        consecutive + 1,
-        0
-      )
-      cat(
-        paste0(
-          "\rOld Fit: ", round(as.numeric(lavaan::fitmeasures(object = currentModelObject$model.output,
-                                                              fit.measures = fitStatistic)), 3),
-          " New Fit: ", round(as.numeric(lavaan::fitmeasures(object = randomNeighborModel$model.output,
-                                                             fit.measures = fitStatistic)), 3),
-          " Probability: ", round(probability, 3)))
+      consecutive <- ifelse(identical(
+        lavaan::parameterTable(newModel$model.output),
+        lavaan::parameterTable(currentModelObject$model.output)
+      ),
+      consecutive + 1,
+      0)
+      cat(paste0(
+        "\rOld Fit: ",
+        round(as.numeric(
+          lavaan::fitmeasures(object = currentModelObject$model.output,
+                              fit.measures = fitStatistic)
+        ), 3),
+        " New Fit: ",
+        round(as.numeric(
+          lavaan::fitmeasures(object = randomNeighborModel$model.output,
+                              fit.measures = fitStatistic)
+        ), 3),
+        " Probability: ",
+        round(probability, 3)
+      ))
       return(newModel)
     }
   }
@@ -437,118 +437,122 @@ consecutiveRestart <-
     }
   }
 
-checkModels <- function(currentModel, fitStatistic, maximize = maximize, bestFit = bestFit, bestModel) {
-  if (is.null(currentModel)) {
-    return(bestModel)
-  }
-  currentFit <- fitWarningCheck(
-    lavaan::fitmeasures(object = currentModel$model.output, fit.measures = fitStatistic),
-    maximize
-  )
-  if (maximize == TRUE) {
-    if (currentFit > bestFit) {
-      bestModel <- currentModel
-    } else {
-      bestModel <- bestModel
+checkModels <-
+  function(currentModel,
+           fitStatistic,
+           maximize = maximize,
+           bestFit = bestFit,
+           bestModel) {
+    if (is.null(currentModel)) {
+      return(bestModel)
     }
-  } else {
-    if (currentFit < bestFit) {
-      bestModel <- currentModel
-    } else {
-      if (currentFit < bestFit) {
+    currentFit <- fitWarningCheck(
+      lavaan::fitmeasures(object = currentModel$model.output, fit.measures = fitStatistic),
+      maximize
+    )
+    if (maximize == TRUE) {
+      if (currentFit > bestFit) {
         bestModel <- currentModel
       } else {
         bestModel <- bestModel
       }
+    } else {
+      if (currentFit < bestFit) {
+        bestModel <- currentModel
+      } else {
+        if (currentFit < bestFit) {
+          bestModel <- currentModel
+        } else {
+          bestModel <- bestModel
+        }
+      }
     }
+
+    return(bestModel)
   }
 
-  return(bestModel)
-}
+modelWarningCheck <-
+  function(expr, modelSyntax) {
+    warn <- err <- c('none')
+    value <- withCallingHandlers(
+      tryCatch(
+        expr,
+        error = function(e) {
+          err <<-
+            append(err, regmatches(paste(e), gregexpr("ERROR: [A-z ]{1,}", paste(e))))
+          NULL
+        }
+      ),
+      warning = function(w) {
+        warn <<-
+          append(warn, regmatches(paste(w), gregexpr("WARNING: [A-z ]{1,}", paste(w))))
+        invokeRestart("muffleWarning")
+      }
+    )
 
-modelWarningCheck <- function(expr, modelSyntax) {
-  warn <- err <- c('none')
-  value <- withCallingHandlers(
-    tryCatch(
+    list(
+      "model.output" = value,
+      "warnings" = as.character(unlist(warn)),
+      "errors" = as.character(unlist(err)),
+      'model.syntax' = modelSyntax
+    )
+  }
+
+
+syntaxExtraction <-
+  function(initialModelSyntaxFile, items) {
+    # extract the latent factor syntax
+    factors <-
+      unique(lavaan::lavaanify(initialModelSyntaxFile)[lavaan::lavaanify(initialModelSyntaxFile)$op ==
+                                                         "=~", "lhs"])
+    vectorModelSyntax <- stringr::str_split(string = initialModelSyntaxFile,
+                                            pattern = "\\n",
+                                            simplify = TRUE)
+    factorSyntax <- c()
+    itemSyntax <- c()
+    for (i in 1:length(factors)) {
+      chosenFactorLocation <-
+        c(1:length(vectorModelSyntax))[grepl(x = vectorModelSyntax, pattern = paste0(factors[i], "[ ]{0,}=~ "))]
+      factorSyntax[i] <- vectorModelSyntax[chosenFactorLocation]
+      # remove the factors from the syntax
+      itemSyntax[i] <-
+        gsub(
+          pattern = paste(factors[i], "=~ "),
+          replacement = "",
+          x = factorSyntax[i]
+        )
+    }
+
+    # extract the items for each factor
+    itemsPerFactor <- stringr::str_extract_all(string = itemSyntax,
+                                               pattern = paste0("(\\b", paste0(
+                                                 paste0(unlist(items), collapse = "\\b)|(\\b"), "\\b)"
+                                               )))
+    return(list("factors" = factors, "itemsPerFactor" = itemsPerFactor))
+  }
+
+fitWarningCheck <-
+  function(expr, maximize) {
+    value <- withCallingHandlers(tryCatch(
       expr,
       error = function(e) {
-        err <<-
-          append(err, regmatches(paste(e), gregexpr("ERROR: [A-z ]{1,}", paste(e))))
-        NULL
+        if (maximize == T) {
+          return(0)
+        } else {
+          return(Inf)
+        }
+        invokeRestart("muffleWarning")
       }
-    ),
-    warning = function(w) {
-      warn <<-
-        append(warn, regmatches(paste(w), gregexpr("WARNING: [A-z ]{1,}", paste(w))))
-      invokeRestart("muffleWarning")
-    }
-  )
-
-  list(
-    "model.output" = value,
-    "warnings" = as.character(unlist(warn)),
-    "errors" = as.character(unlist(err)),
-    'model.syntax' = modelSyntax
-  )
-}
-
-
-syntaxExtraction <- function(initialModelSyntaxFile, items) {
-
-  # extract the latent factor syntax
-  factors <- unique(lavaan::lavaanify(initialModelSyntaxFile)[lavaan::lavaanify(initialModelSyntaxFile)$op ==
-                                                                "=~", "lhs"])
-  vectorModelSyntax <- stringr::str_split(
-    string = initialModelSyntaxFile,
-    pattern = "\\n",
-    simplify = TRUE
-  )
-  factorSyntax <- c()
-  itemSyntax <- c()
-  for (i in 1:length(factors)) {
-    chosenFactorLocation <- c(1:length(vectorModelSyntax))[grepl(x = vectorModelSyntax, pattern = paste0(factors[i], "[ ]{0,}=~ "))]
-    factorSyntax[i] <- vectorModelSyntax[chosenFactorLocation]
-    # remove the factors from the syntax
-    itemSyntax[i] <-
-      gsub(
-        pattern = paste(factors[i], "=~ "),
-        replacement = "",
-        x = factorSyntax[i]
-      )
-  }
-
-  # extract the items for each factor
-  itemsPerFactor <- stringr::str_extract_all(
-    string = itemSyntax,
-    pattern = paste0("(\\b", paste0(
-      paste0(unlist(items), collapse = "\\b)|(\\b"), "\\b)"
     ))
-  )
-  return(list("factors" = factors, "itemsPerFactor" = itemsPerFactor))
-}
-
-fitWarningCheck <- function(expr, maximize) {
-  value <- withCallingHandlers(tryCatch(expr,
-                                        error = function(e) {
-                                          if (maximize == T) {
-                                            return(0)
-                                          } else {
-                                            return(Inf)
-                                          }
-                                          invokeRestart("muffleWarning")
-                                        }
-  ))
-  return(value)
-}
+    return(value)
+  }
 
 
 checkModelSpecs <-
-  function(
-    x
-  ) {
-
+  function(x) {
     requiredElements <-
-      c('model.type',
+      c(
+        'model.type',
         'auto.var',
         'estimator',
         'ordered',
@@ -560,68 +564,108 @@ checkModelSpecs <-
         'auto.th',
         'auto.delta',
         'auto.cov.y',
-        'std.lv')
+        'std.lv'
+      )
 
     missingSpecs <-
-      requiredElements[
-        which(
-          !requiredElements %in% names(x)
-        )
-        ]
+      requiredElements[which(!requiredElements %in% names(x))]
 
     if (length(missingSpecs) > 0) {
       errorMessage <-
-        paste0("The following elements of lavaan.model.specs have not been specified:\n\n",
-               paste(missingSpecs, collapse = "\n"),
-               "\n\nPlease include the proper specifications for these elements, or use the default values provided.")
+        paste0(
+          "The following elements of lavaan.model.specs have not been specified:\n\n",
+          paste(missingSpecs, collapse = "\n"),
+          "\n\nPlease include the proper specifications for these elements, or use the default values provided."
+        )
       stop(errorMessage)
     }
   }
 
 fitmeasuresCheck <-
-  function(
-    x
-  ) {
+  function(x) {
     validMeasures <-
       c(
-        "npar", "fmin",
-        "chisq", "df", "pvalue",
-        "baseline.chisq", "baseline.df", "baseline.pvalue",
-        "cfi", "tli", "nnfi",
-        "rfi", "nfi", "pnfi",
-        "ifi", "rni",
-        "logl", "unrestricted.logl",
-        "aic", "bic", "ntotal", "bic2",
-        "rmsea", "rmsea.ci.lower", "rmsea.ci.upper", "rmsea.pvalue",
-        "rmr", "rmr_nomean",
-        "srmr", "srmr_bentler", "srmr_bentler_nomean",
-        "crmr", "crmr_nomean", "srmr_mplus", "srmr_mplus_nomean",
-        "cn_05", "cn_01",
-        "gfi", "agfi", "pgfi", "mfi", "ecvi",
-        "chisq.scaled", "df.scaled", "pvalue.scaled", "chisq.scaling.factor",
-        "baseline.chisq.scaled", "baseline.df.scaled", "baseline.pvalue.scaled",
+        "npar",
+        "fmin",
+        "chisq",
+        "df",
+        "pvalue",
+        "baseline.chisq",
+        "baseline.df",
+        "baseline.pvalue",
+        "cfi",
+        "tli",
+        "nnfi",
+        "rfi",
+        "nfi",
+        "pnfi",
+        "ifi",
+        "rni",
+        "logl",
+        "unrestricted.logl",
+        "aic",
+        "bic",
+        "ntotal",
+        "bic2",
+        "rmsea",
+        "rmsea.ci.lower",
+        "rmsea.ci.upper",
+        "rmsea.pvalue",
+        "rmr",
+        "rmr_nomean",
+        "srmr",
+        "srmr_bentler",
+        "srmr_bentler_nomean",
+        "crmr",
+        "crmr_nomean",
+        "srmr_mplus",
+        "srmr_mplus_nomean",
+        "cn_05",
+        "cn_01",
+        "gfi",
+        "agfi",
+        "pgfi",
+        "mfi",
+        "ecvi",
+        "chisq.scaled",
+        "df.scaled",
+        "pvalue.scaled",
+        "chisq.scaling.factor",
+        "baseline.chisq.scaled",
+        "baseline.df.scaled",
+        "baseline.pvalue.scaled",
         "baseline.chisq.scaling.factor",
-        "cfi.scaled", "tli.scaled",
-        "cfi.robust", "tli.robust",
-        "nnfi.scaled", "nnfi.robust",
-        "rfi.scaled",  "nfi.scaled", "ifi.scaled", "rni.scaled", "rni.robust",
-        "rmsea.scaled", "rmsea.ci.lower.scaled", "rmsea.ci.upper.scaled",
-        "rmsea.pvalue.scaled", "rmsea.robust", "rmsea.ci.lower.robust",
-        "rmsea.ci.upper.robust", "rmsea.pvalue.robust"
+        "cfi.scaled",
+        "tli.scaled",
+        "cfi.robust",
+        "tli.robust",
+        "nnfi.scaled",
+        "nnfi.robust",
+        "rfi.scaled",
+        "nfi.scaled",
+        "ifi.scaled",
+        "rni.scaled",
+        "rni.robust",
+        "rmsea.scaled",
+        "rmsea.ci.lower.scaled",
+        "rmsea.ci.upper.scaled",
+        "rmsea.pvalue.scaled",
+        "rmsea.robust",
+        "rmsea.ci.lower.robust",
+        "rmsea.ci.upper.robust",
+        "rmsea.pvalue.robust"
       )
 
     invalidMeasures <-
-      x[
-        which(
-          !x %in% validMeasures
-        )
-        ]
+      x[which(!x %in% validMeasures)]
 
     if (length(invalidMeasures) > 0) {
       errorMessage <-
-        paste0("The following elements of fit.indices or fitStatistics are not valid fit measures provided by the lavaan::fitmeasures function:\n\n",
-               paste(invalidMeasures, collapse = "\n"),
-               "\n\nPlease check the output of this function for proper spelling and capitalization of the fit measure(s) you are interested in.")
+        paste0(
+          "The following elements of fit.indices or fitStatistics are not valid fit measures provided by the lavaan::fitmeasures function:\n\n",
+          paste(invalidMeasures, collapse = "\n"),
+          "\n\nPlease check the output of this function for proper spelling and capitalization of the fit measure(s) you are interested in."
+        )
       stop(errorMessage)
     }
 
@@ -631,23 +675,26 @@ fitStatTestCheck <-
   function(measures, test) {
     tempEnv <-
       new.env()
-    mapply(
-      assign,
-      measures,
-      0,
-      MoreArgs=list(envir = tempEnv))
+    mapply(assign,
+           measures,
+           0,
+           MoreArgs = list(envir = tempEnv))
 
     checkIfEval <-
       tryCatch(
-        expr = eval(parse(text=test),
+        expr = eval(parse(text = test),
                     envir = tempEnv),
         error = function(e) {
-          stop("There was a problem with the fit.statistics.test provided. It cannot be evaluated properly. Please read the function documentation to see how to properly specify a test.")
+          stop(
+            "There was a problem with the fit.statistics.test provided. It cannot be evaluated properly. Please read the function documentation to see how to properly specify a test."
+          )
         }
       )
 
     if (!is.character(test)) {
-      stop("There is a problem with the fit.statistics.test provided. The fit.statistics.test was given as a logical, not a character. Please read the function documentation to see how to properly specify a test. ")
+      stop(
+        "There is a problem with the fit.statistics.test provided. The fit.statistics.test was given as a logical, not a character. Please read the function documentation to see how to properly specify a test. "
+      )
     }
 
   }

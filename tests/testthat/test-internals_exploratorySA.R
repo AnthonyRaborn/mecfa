@@ -177,9 +177,12 @@ test_that(
     # model fits but throws a warning
     warningModel <-
       modelWarningCheck(
-        expr = lavaan(poorModel, data=HolzingerSwineford1939,
-                      auto.var=TRUE, auto.fix.first=TRUE,
-                      auto.cov.lv.x=F, ordered = T),
+        expr = lavaan::lavaan(poorModel,
+                              data = lavaan::HolzingerSwineford1939,
+                              auto.var=TRUE,
+                              auto.fix.first=TRUE,
+                              auto.cov.lv.x=F,
+                              ordered = T),
         modelSyntax = poorModel
       )
 

@@ -152,9 +152,11 @@ test_that(
     # model fits without error
     goodModel <-
       modelWarningCheck(
-        expr = lavaan(defaultModel, data=HolzingerSwineford1939,
-                      auto.var=TRUE, auto.fix.first=TRUE,
-                      auto.cov.lv.x=TRUE),
+        expr = lavaan::lavaan(defaultModel,
+                              data = lavaan::HolzingerSwineford1939,
+                              auto.var=TRUE,
+                              auto.fix.first=TRUE,
+                              auto.cov.lv.x=TRUE),
         modelSyntax = defaultModel
       )
 
@@ -164,9 +166,11 @@ test_that(
     # model doesn't fit and throws an error
     noModel <-
       modelWarningCheck(
-        expr = lavaan(wrongItemModel, data=HolzingerSwineford1939,
-                      auto.var=TRUE, auto.fix.first=TRUE,
-                      auto.cov.lv.x=F),
+        expr = lavaan::lavaan(wrongItemModel,
+                              data = lavaan::HolzingerSwineford1939,
+                              auto.var=TRUE,
+                              auto.fix.first=TRUE,
+                              auto.cov.lv.x=F),
         modelSyntax = wrongItemModel
       )
 
@@ -195,6 +199,75 @@ test_that(
 
 test_that(
   "checkModels returns the appropriate bestModel depending on the conditions", {
+    # example models
+    bestHolzinger <-
+      list('model.output' =
+             lavaan::lavaan(model =
+             ' visual  =~ x1 + x2 + x3
+             textual =~ x4 + x5 + x6
+             speed   =~ x7 + x8 + x9 ',
+             data = lavaan::HolzingerSwineford1939,
+             auto.var=TRUE,
+             auto.fix.first=TRUE,
+             auto.cov.lv.x=TRUE)
+           )
+    badHolzinger <-
+      list('model.output' =
+             lavaan::lavaan(model =
+               ' visual  =~ x1 + x2 + x3 + x7
+              textual =~ x4 + x5 + x6 + x8 + x9',
+             data = lavaan::HolzingerSwineford1939,
+             auto.var=TRUE,
+             auto.fix.first=TRUE,
+             auto.cov.lv.x=TRUE)
+      )
 
+    # models are same, return one of them
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+        ),
+      bestHolzinger
+    )
+
+    # comparing best model to (current) bad model, return best
+    expect_equal(
+      checkModels(
+        currentModel = badHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # comparing (current bad) best model to (new) best model, return best
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(badHolzinger$model.output, 'cfi'),
+        bestModel = badHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # expect the bestModel if the currentModel is improperly specified
+    expect_equal(
+      checkModels(
+        currentModel = "bestHolzinger",
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
   }
 )

@@ -345,7 +345,7 @@ goal <-
   }
 
 selectionFunction <-
-  function(currentModelObject = currentModel,
+  function(currentModelObject,
            randomNeighborModel,
            currentTemp,
            maximize,

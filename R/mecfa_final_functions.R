@@ -27,9 +27,9 @@ bestECFA <-
         results[[i]]@best_fit
     }
     if (max) {
-      results[[which(all_final_fit==max(all_final_fit))]]
+      results[[which(all_final_fit==max(all_final_fit))[1]]]
     } else {
-      results[[which(all_final_fit==min(all_final_fit))]]
+      results[[which(all_final_fit==min(all_final_fit))[1]]]
     }
   }
 

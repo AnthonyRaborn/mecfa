@@ -49,7 +49,7 @@ for (i in f) { # for each number of factors
             c()
           for (factors in 1:i) {
             factorSyntax[factors] <-
-              paste0("f", factors, " ~ ",
+              paste0("f", factors, " =~ ",
                      paste0(itemsWithLoadings[itemsPerFactorLabel==factors], collapse = " + ")
               )
           }

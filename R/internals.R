@@ -380,14 +380,16 @@ selectionFunction <-
       cat(paste0(
         "\rOld Fit: ",
         round(as.numeric(
-          lavaan::fitmeasures(object = currentModelObject$model.output,
-                              fit.measures = fitStatistic)
-        ), 3),
+          fitWarningCheck(
+            lavaan::fitmeasures(object = currentModelObject$model.output,
+                                fit.measures = fitStatistic)
+            )), 3),
         " New Fit: ",
         round(as.numeric(
-          lavaan::fitmeasures(object = randomNeighborModel$model.output,
-                              fit.measures = fitStatistic)
-        ), 3),
+          fitWarningCheck(
+            lavaan::fitmeasures(object = randomNeighborModel$model.output,
+                                fit.measures = fitStatistic)
+        )), 3),
         "                                                                    "
       ))
       return(randomNeighborModel)

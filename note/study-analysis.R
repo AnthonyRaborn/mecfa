@@ -80,7 +80,7 @@ for (i in 1:length(dataFiles)) {
     stringr::str_extract(
       string = currentCondition,
       pattern = "(?<=Factors \\= )[0-9]{1}"
-    )
+      )
 
   itemsNumber <-
     stringr::str_extract(
@@ -96,13 +96,13 @@ for (i in 1:length(dataFiles)) {
   models <-
     vector(mode = 'character',
            length = length(factorNames) - 1
-    )
+           )
 
   cfiResults <-
     bicResults <-
     vector(mode = 'list',
            length = length(currentDataList)
-    )
+           )
   for (j in 1:length(models)) {
     tempFactors <-
       factorNames[1:(j+1)]
@@ -118,7 +118,7 @@ for (i in 1:length(dataFiles)) {
       tempItems <-
         c(tempItems,
           paste0(itemAssignment[[k]], collapse = " + ")
-        )
+          )
     }
 
     tempModel <-
@@ -156,12 +156,10 @@ for (i in 1:length(dataFiles)) {
       message <-
         paste0("Computer **", Sys.info()['nodename'], "**\nrunning condition **", currentCondition, "**\nis at iteration ", l, ".")
       RCurl::postForm(url, 'Content-type'='application/json', content=message, style= "POST")
-      cat(message)
-
       saveRDS(object = cfiResults,
-              file = paste0("results/", currentCondition, " CFI results.RDS"))
+              file = paste0(currentCondition, " CFI results.RDS"))
       saveRDS(object = bicResults,
-              file = paste0("results/", currentCondition, " BIC results.RDS"))
+              file = paste0(currentCondition, " BIC results.RDS"))
     }
 
   }

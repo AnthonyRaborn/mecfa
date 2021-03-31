@@ -345,24 +345,23 @@ goal <-
   }
 
 selectionFunction <-
-  function(currentModelObject,
-           randomNeighborModel,
-           currentTemp,
-           maximize,
-           fitStatistic,
-           consecutive) {
-    # check that the models aren't null
+  function (currentModelObject,
+            randomNeighborModel,
+            currentTemp,
+            maximize,
+            fitStatistic,
+            consecutive)
+  {
     if (is.null(currentModelObject$model.output)) {
       return(randomNeighborModel)
     }
     if (is.null(randomNeighborModel$model.output)) {
       return(currentModelObject)
     }
-
-    # check for convergence
     randomNeighborConverge <-
       tryCatch(
-        lavaan::fitmeasures(object = randomNeighborModel$model.output, fit.measures = fitStatistic),
+        lavaan::fitmeasures(object = randomNeighborModel$model.output,
+                            fit.measures = fitStatistic),
         error = function(e) {
           if (length(e) > 0) {
             NULL
@@ -373,46 +372,51 @@ selectionFunction <-
       cat("\rNew model did not converge.                                                                                          ")
       return(currentModelObject)
     }
-
-    # this is the Kirkpatrick et al. method of selecting between currentModel and randomNeighborModel
-    if (goal(randomNeighborModel$model.output, fitStatistic, maximize) < goal(currentModelObject$model.output, fitStatistic, maximize)) {
-      # consecutive <- consecutive + 1
+    if (goal(randomNeighborModel$model.output, fitStatistic,
+             maximize) < goal(currentModelObject$model.output, fitStatistic,
+                              maximize)) {
       cat(paste0(
         "\rOld Fit: ",
         round(as.numeric(
           fitWarningCheck(
             lavaan::fitmeasures(object = currentModelObject$model.output,
-                                fit.measures = fitStatistic)
-            )), 3),
+                                fit.measures = fitStatistic),
+            maximize
+          )
+        ), 3),
         " New Fit: ",
         round(as.numeric(
           fitWarningCheck(
             lavaan::fitmeasures(object = randomNeighborModel$model.output,
-                                fit.measures = fitStatistic)
-        )), 3),
+                                fit.measures = fitStatistic),
+            maximize
+          )
+        ), 3),
         "                                                                    "
       ))
       return(randomNeighborModel)
-    } else {
+    }
+    else {
       probability <- exp(-(
-        goal(randomNeighborModel$model.output, fitStatistic, maximize) - goal(currentModelObject$model.output, fitStatistic, maximize)
+        goal(randomNeighborModel$model.output,
+             fitStatistic, maximize) - goal(currentModelObject$model.output,
+                                            fitStatistic, maximize)
       ) / currentTemp)
-
       if (is.nan(probability))
         probability = 0
-
       if (probability > stats::runif(1)) {
         newModel <- randomNeighborModel
-      } else {
+      }
+      else {
         newModel <- currentModelObject
       }
-
-      consecutive <- ifelse(identical(
-        lavaan::parameterTable(newModel$model.output),
-        lavaan::parameterTable(currentModelObject$model.output)
-      ),
-      consecutive + 1,
-      0)
+      consecutive <-
+        ifelse(identical(
+          lavaan::parameterTable(newModel$model.output),
+          lavaan::parameterTable(currentModelObject$model.output)
+        ),
+        consecutive + 1,
+        0)
       cat(paste0(
         "\rOld Fit: ",
         round(as.numeric(
@@ -430,6 +434,7 @@ selectionFunction <-
       return(newModel)
     }
   }
+
 
 consecutiveRestart <-
   function(maxConsecutiveSelection = 25, consecutive) {

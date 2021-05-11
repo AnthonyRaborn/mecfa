@@ -81,6 +81,53 @@ setMethod('summary',
           }
           )
 
+#' Plot method for class `exploratorySA`
+#'
+#' @param x,y An S4 object of class `exploratorySA`.
+#' @param ... Not used.
+#'
+#' @export
+#' @importFrom graphics legend lines par
+#' @importFrom methods slot
+setMethod('plot',
+          signature = 'exploratorySA',
+          definition = function(x, y, ...) {
+
+            temp <- sapply(x@modelResults, slot, "all_fit")
+
+            availableColors <-
+              c("black", "#DF536B", "#61D04F", "#2297E6", "#28E2E5", "#D03AF5", "#EEC21F", "gray62")
+
+            par(oma = c(0,0,0,5))
+            plot(
+              temp[,1],
+              col = availableColors[1],
+              type = 'l',
+              ylim = c(min(temp, na.rm = T), max(temp, na.rm = T)),
+              bty = "L",
+              main = "Model Fit Results per # of Factors",
+              ylab = paste0("Fit Statistic: ",
+                            as.list(x@functionCall)[-1]$fitStatistic),
+              xlab = "Step"
+            )
+
+            if (2 <= ncol(temp) & ncol(temp) <=8 ) {
+
+              for (i in 2:ncol(temp)) {
+                lines(temp[,i], col = availableColors[i])
+              }
+              legend(
+                par()$usr[2], par()$usr[4],
+                legend = paste0("Factors: ", 1:ncol(temp)),
+                col = availableColors[1:ncol(temp)],
+                lty = 1,
+                bty = 'n',
+                xpd = NA)
+            }
+          }
+)
+
+
 #' Exploratory CFA using Simulated Annealing
 #'
 #' @param initialModels The initial model as a `character` vector with lavaan model syntax. Each starting model should be its own element in the vector.

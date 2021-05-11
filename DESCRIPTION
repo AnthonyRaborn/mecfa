@@ -1,14 +1,17 @@
 Package: mecfa
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Metaheuristic Exploratory/Confirmatory Factor Analysis
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: GPL
+Date: 2021-05-10
+Author: Anthony Raborn <anthony.w.raborn@gmail.com>
+Maintainer: Anthony Raborn <anthony.w.raborn@gmail.com>
+Description: Utilizes metaheuristic algorithms to simultaneously find the best-
+    fitting model for various factor structures and select which factor 
+    structure has the highest fit. Currently, simulated annealing is the only 
+    metaheuristic algorithm in use, but ant colony optimization may be 
+    incorporated in the future.
+License: LGPL (>= 2.0, < 3) | Mozilla Public License
 Encoding: UTF-8
-LazyData: TRUE
 RoxygenNote: 7.1.1
 Suggests:
     knitr,
@@ -23,4 +26,4 @@ Imports:
     foreach,
     methods
 Depends:
-    R (>= 3.0.0)
+    R (>= 4.0.0)

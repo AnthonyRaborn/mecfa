@@ -121,7 +121,8 @@ exploratorySA <-
              auto.cov.lv.x = TRUE,
              auto.th = TRUE,
              auto.delta = TRUE,
-             auto.cov.y = TRUE
+             auto.cov.y = TRUE,
+             missing = "listwise"
            ),
            maxChanges = 5,
            restartCriteria = "consecutive",
@@ -203,7 +204,8 @@ exploratorySA <-
                                 auto.efa = auto.efa,
                                 auto.th = auto.th,
                                 auto.delta = auto.delta,
-                                auto.cov.y = auto.cov.y),
+                                auto.cov.y = auto.cov.y,
+                                missing = missing),
                              originalData = originalData,
                              maxSteps = maxSteps,
                              fitStatistic = fitStatistic,

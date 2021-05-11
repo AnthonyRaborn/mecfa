@@ -17,7 +17,7 @@ ecfaSA(
   lavaan.model.specs = list(model.type = "cfa", auto.var = TRUE, estimator = "default",
     ordered = NULL, int.ov.free = TRUE, int.lv.free = FALSE, std.lv = TRUE,
     auto.fix.first = FALSE, auto.fix.single = TRUE, auto.cov.lv.x = TRUE, auto.th = TRUE,
-    auto.delta = TRUE, auto.cov.y = TRUE),
+    auto.delta = TRUE, auto.cov.y = TRUE, missing = "listwise"),
   maxChanges = 5,
   restartCriteria = "consecutive",
   maximumConsecutive = 25,

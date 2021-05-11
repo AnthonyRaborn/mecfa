@@ -66,7 +66,8 @@ ecfaSA <-
              auto.cov.lv.x = TRUE,
              auto.th = TRUE,
              auto.delta = TRUE,
-             auto.cov.y = TRUE
+             auto.cov.y = TRUE,
+             missing = "listwise"
            ),
            maxChanges = 5,
            restartCriteria = "consecutive",
@@ -108,6 +109,7 @@ ecfaSA <-
           auto.cov.y = auto.cov.y,
           ordered = ordered,
           estimator = estimator,
+          missing = missing
         ),
         modelSyntax = lavaan::partable(initialModel)
       )

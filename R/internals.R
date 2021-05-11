@@ -209,7 +209,8 @@ randomNeighborShort <-
         auto.cov.lv.x = auto.cov.lv.x,
         auto.th = auto.th,
         auto.delta = auto.delta,
-        auto.cov.y = auto.cov.y
+        auto.cov.y = auto.cov.y,
+        missing = missing
       ),
       modelSyntax = newModelSyntax
     )

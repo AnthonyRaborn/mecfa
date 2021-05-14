@@ -519,11 +519,7 @@ fitWarningCheck <-
     value <- withCallingHandlers(tryCatch(
       expr,
       error = function(e) {
-        if (maximize == T) {
-          return(0)
-        } else {
-          return(Inf)
-        }
+        return(NA)
         invokeRestart("muffleWarning")
       }
     ))

@@ -1,3 +1,15 @@
+# randomInitialModel ####
+
+# randomNeighborShort ####
+
+# randomNeighborFull ####
+
+# selectionFunction ####
+
+# consecutiveRestart ####
+
+# checkModels ####
+
 test_that(
   "fitmeasuresCheck returns silent when working, error when not", {
     #when provided correct fitmeasure
@@ -270,4 +282,8 @@ test_that(
       bestHolzinger
     )
   }
+)
+
+test_that(
+  "check if "
 )

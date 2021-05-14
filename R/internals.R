@@ -433,6 +433,11 @@ checkModels <-
       lavaan::fitmeasures(object = currentModel$model.output, fit.measures = fitStatistic),
       maximize
     )
+
+    if (is.na(currentFit)) {
+      return(bestModel)
+    }
+
     if (maximize == TRUE) {
       if (currentFit > bestFit) {
         bestModel <- currentModel
@@ -443,11 +448,7 @@ checkModels <-
       if (currentFit < bestFit) {
         bestModel <- currentModel
       } else {
-        if (currentFit < bestFit) {
-          bestModel <- currentModel
-        } else {
-          bestModel <- bestModel
-        }
+        bestModel <- bestModel
       }
     }
     return(bestModel)

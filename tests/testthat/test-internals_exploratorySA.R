@@ -1,39 +1,21 @@
 # randomInitialModel ####
-
-# randomNeighborShort ####
-
-# randomNeighborFull ####
-
-# selectionFunction ####
-
-# consecutiveRestart ####
-
-# checkModels ####
-
 test_that(
-  "fitmeasuresCheck returns silent when working, error when not", {
-    #when provided correct fitmeasure
-    expect_silent(
-      fitmeasuresCheck('cfi')
-      )
-
-    #when provided incorrect fitmeasure as string
-    expect_error(
-      fitmeasuresCheck('something')
-    )
-
-    #when provided incorrect fitmeasure as not-a-string
-    expect_error(
-      fitmeasuresCheck(2)
-    )
-    }
-  )
-
-test_that(
-  "checkModelSpecs returns silent when working, error when not", {
-    # full, correct model specs list
-    lavaanDesc <-
-      list(model.type = "sem",
+  "randomInitialModel produces a list of appropriate length and with appropriate names", {
+    defaultModel <-
+    ' visual  =~ x1 + x2 + x3
+      textual =~ x4 + x5 + x6
+      speed   =~ x7 + x8 + x9'
+    defaultBifactor <-
+    ' visual   =~ x1 + x2 + x3
+      textual  =~ x4 + x5 + x6
+      speed    =~ x7 + x8 + x9
+      bifactor =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9'
+    maxItems <- c(2,2,2)
+    allItems <- paste0("x", 1:9)
+    data <- lavaan::HolzingerSwineford1939
+    bifactor <- FALSE
+    lavaanSpecs <-
+      list(model.type = "cfa",
            estimator = "ML",
            ordered = NULL,
            int.ov.free = TRUE,
@@ -46,14 +28,129 @@ test_that(
            auto.efa = TRUE,
            auto.th = TRUE,
            auto.delta = TRUE,
-           auto.cov.y = TRUE)
+           auto.cov.y = TRUE,
+           missing = "listwise")
 
-    # correct model specs list with missing values
-    lavaanErr <-
-      list(model.type = "sem",
+    ## bifactorModel == FALSE ####
+    # should output a list
+    expect_type(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      'list'
+    )
+
+    # the list should be of length 4
+    expect_length(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      4
+    )
+
+    # the list should have specified names in specified order
+    expect_named(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      expected =
+        c("model.output", "warnings", "errors", "model.syntax")
+    )
+
+    # bifactor == TRUE ####
+    bifactor = TRUE
+    # should output a list
+    expect_type(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      'list'
+    )
+
+    # the list should be of length 4
+    expect_length(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      4
+    )
+
+    # the list should have specified names in specified order
+    expect_named(
+      randomInitialModel(
+        init.model = defaultModel,
+        maxItems = maxItems,
+        allItems = allItems,
+        initialData = data,
+        bifactorModel = bifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      expected =
+        c("model.output", "warnings", "errors", "model.syntax")
+    )
+  }
+)
+
+# randomNeighborShort ####
+test_that(
+  "randomNeighborShort produces a list of appropriate length and with appropriate names", {
+    defaultModel <-
+    ' visual  =~ x1 + x2
+      textual =~ x4 + x5
+      speed   =~ x7 + x8'
+    defaultBifactor <-
+    ' visual   =~ x1 + x2
+      textual  =~ x4 + x5
+      speed    =~ x7 + x8
+      bifactor =~ x1 + x2 + x4 + x5 + x7 + x8'
+    currentModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model = defaultModel,
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax = defaultModel
+      )
+    currentBifactor <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model = defaultBifactor,
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax = defaultModel
+      )
+    lavaanSpecs <-
+      list(model.type = "cfa",
            estimator = "ML",
            ordered = NULL,
            int.ov.free = TRUE,
+           int.lv.free = FALSE,
+           auto.fix.first = FALSE,
            std.lv = TRUE,
            auto.fix.single = TRUE,
            auto.var = TRUE,
@@ -61,94 +158,407 @@ test_that(
            auto.efa = TRUE,
            auto.th = TRUE,
            auto.delta = TRUE,
-           auto.cov.y = TRUE)
+           auto.cov.y = TRUE,
+           missing = "listwise")
 
-    expect_silent(
-      checkModelSpecs(lavaanDesc)
+    ## bifactorModel == FALSE ####
+    # should output a list
+    expect_type(
+      randomNeighborShort(
+        currentModelObject = currentModel,
+        numChanges = 1,
+        allItems = paste0("x", 1:9),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = FALSE,
+        init.model = defaultModel,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      'list'
     )
 
-    expect_error(
-      checkModelSpecs(lavaanErr)
+    # the list should be of length 4
+    expect_length(
+      randomNeighborShort(
+        currentModelObject = currentModel,
+        numChanges = 1,
+        allItems = paste0("x", 1:9),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = FALSE,
+        init.model = defaultModel,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      4
+    )
+
+    # the list should have specified names in specified order
+    expect_named(
+      randomNeighborShort(
+        currentModelObject = currentModel,
+        numChanges = 1,
+        allItems = list(paste0("x", 1:3), paste0("x", 4:6), paste0("x", 7:9)),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = FALSE,
+        init.model = defaultModel,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      expected =
+        c("model.output", "warnings", "errors", "model.syntax")
+    )
+
+    # bifactorModel == FALSE ####
+    # should output a list
+    expect_type(
+      randomNeighborShort(
+        currentModelObject = currentBifactor,
+        numChanges = 1,
+        allItems = paste0("x", 1:9),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = TRUE,
+        init.model = defaultBifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      'list'
+    )
+
+    # the list should be of length 4
+    expect_length(
+      randomNeighborShort(
+        currentModelObject = currentBifactor,
+        numChanges = 1,
+        allItems = paste0("x", 1:9),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = TRUE,
+        init.model = defaultBifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      4
+    )
+
+    # the list should have specified names in specified order
+    expect_named(
+      randomNeighborShort(
+        currentModelObject = currentBifactor,
+        numChanges = 1,
+        allItems = paste0("x", 1:9),
+        data = lavaan::HolzingerSwineford1939,
+        bifactor = TRUE,
+        init.model = defaultBifactor,
+        lavaan.model.specs = lavaanSpecs
+      ),
+      expected =
+        c("model.output", "warnings", "errors", "model.syntax")
     )
   }
-  )
-
+)
+# randomNeighborFull ####
 test_that(
-  "fitWarningCheck returns value when working and 0 or Inf or -Inf depending on maximize", {
-    exampleCFI <-
-      0.95
-    exampleChisq <-
-      120
-
-    # normal input/output
-    expect_equal(
-      object =
-        fitWarningCheck(expr = exampleCFI,
-                      maximize = TRUE),
-      expected = exampleCFI
+  "randomNeighborFull produces a list of appropriate length and with appropriate names", {
+    currentModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+          ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9'
+      )
+    # should produce a message
+    expect_message(
+      randomNeighborFull(
+        currentModelObject = currentModel$model.output,
+        numChanges = 1,
+        data = lavaan::HolzingerSwineford1939
+      )
     )
 
-    expect_equal(
-      object =
-        fitWarningCheck(expr = exampleChisq,
-                      maximize = FALSE),
-      expected = exampleChisq
+    # should output a list
+    expect_type(
+      randomNeighborFull(
+        currentModelObject = currentModel$model.output,
+        numChanges = 2,
+        data = lavaan::HolzingerSwineford1939
+      ),
+      'list'
     )
 
-    # error input, maximize
-    expect_equal(
-      object =
-        fitWarningCheck(expr = 'exampleNull'/2,
-                        maximize = TRUE),
-      expected = 0
+    # the list should be of length 4
+    expect_length(
+      randomNeighborFull(
+        currentModelObject = currentModel$model.output,
+        numChanges = 2,
+        data = lavaan::HolzingerSwineford1939
+      ),
+      4
     )
 
-    # error input, minimize
+    # the list should have specified names in specified order
+    expect_named(
+      randomNeighborFull(
+        currentModelObject = currentModel$model.output,
+        numChanges = 2,
+        data = lavaan::HolzingerSwineford1939
+      ),
+      expected =
+        c("model.output", "warnings", "errors", "model.syntax")
+    )
+
+
+  }
+)
+# goal ####
+test_that(
+  "goal returns the 'energy' value of a fit statistic test, including in cases of NA fit", {
+    currentModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+            ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9'
+      )
+    currentBadModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+          ' visual  =~ x1 + x2 + x3 + x4 + x5 + x6
+            textual =~ x4 + x5 + x6 + x7 + x8 + x9
+            speed   =~ x7 + x8 + x9 + x1 + x2 + x3',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3 + x4 + x5 + x6
+            textual =~ x4 + x5 + x6 + x7 + x8 + x9
+            speed   =~ x7 + x8 + x9 + x1 + x2 + x3'
+      )
+
+    # lavaan input with single, maximized fit statistic should equal the negative value of the fit statistic
     expect_equal(
-      object =
-        fitWarningCheck(expr = 'exampleNull'/2,
-                        maximize = FALSE),
-      expected = Inf
+      goal(
+        x = currentModel$model.output,
+        fitStatistic = 'cfi',
+        maximize = T
+        ),
+      -fitmeasures(
+        object = currentModel$model.output,
+        fit.measures = 'cfi'
+      )
+    )
+
+    # lavaan input with single, minimized fit statistic should equal the value of that fit statistic
+    expect_equal(
+      goal(
+        x = currentModel$model.output,
+        fitStatistic = 'rmsea',
+        maximize = F
+      ),
+      fitmeasures(
+        object = currentModel$model.output,
+        fit.measures = 'rmsea'
+      )
+    )
+
+    # lavaan input with no fit statistc due to poor model, goal maximized
+    expect_equal(
+      goal(
+        x = currentBadModel$model.output,
+        fitStatistic = 'cfi',
+        maximize = T
+      ),
+      Inf
+    )
+
+    # lavaan input with no fit statistc due to poor model, goal minimized
+    expect_equal(
+      goal(
+        x = currentBadModel$model.output,
+        fitStatistic = 'rmsea',
+        maximize = F
+      ),
+      Inf
+    )
+
+  }
+)
+# selectionFunction ####
+
+# consecutiveRestart ####
+
+# checkModels ####
+test_that(
+  "checkModels returns the appropriate bestModel depending on the conditions", {
+    # example models
+    bestHolzinger <-
+      list('model.output' =
+             lavaan::lavaan(model =
+                              ' visual  =~ x1 + x2 + x3
+             textual =~ x4 + x5 + x6
+             speed   =~ x7 + x8 + x9 ',
+                            data = lavaan::HolzingerSwineford1939,
+                            auto.var=TRUE,
+                            auto.fix.first=TRUE,
+                            auto.cov.lv.x=TRUE)
+      )
+    badHolzinger <-
+      list('model.output' =
+             lavaan::lavaan(model =
+                              ' visual  =~ x1 + x2 + x3 + x7
+              textual =~ x4 + x5 + x6 + x8 + x9',
+                            data = lavaan::HolzingerSwineford1939,
+                            auto.var=TRUE,
+                            auto.fix.first=TRUE,
+                            auto.cov.lv.x=TRUE)
+      )
+
+    # model is null, return bestModel
+    expect_equal(
+      checkModels(
+        currentModel = NULL,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    ## maximize == TRUE ####
+    # models are same, return one of them
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # comparing best model to (current) bad model, return best
+    expect_equal(
+      checkModels(
+        currentModel = badHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # comparing (current bad) best model to (new) best model, return best
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(badHolzinger$model.output, 'cfi'),
+        bestModel = badHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # expect the bestModel if the currentModel is improperly specified
+    expect_equal(
+      checkModels(
+        currentModel = "bestHolzinger",
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # compare currentModel (as best so far) to true bestModel, return best
+
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'cfi',
+        maximize = TRUE,
+        bestFit = fitmeasures(badHolzinger$model.output, 'cfi'),
+        bestModel = badHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # maximize == FALSE ####
+    # models are same, return one of them
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'rmsea',
+        maximize = FALSE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'rmsea'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # comparing best model to (current) bad model, return best
+    expect_equal(
+      checkModels(
+        currentModel = badHolzinger,
+        fitStatistic = 'rmsea',
+        maximize = FALSE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'rmsea'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # comparing (current bad) best model to (new) best model, return best
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'rmsea',
+        maximize = FALSE,
+        bestFit = fitmeasures(badHolzinger$model.output, 'rmsea'),
+        bestModel = badHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # expect the bestModel if the currentModel is improperly specified
+    expect_equal(
+      checkModels(
+        currentModel = "bestHolzinger",
+        fitStatistic = 'rmsea',
+        maximize = FALSE,
+        bestFit = fitmeasures(bestHolzinger$model.output, 'rmsea'),
+        bestModel = bestHolzinger
+      ),
+      bestHolzinger
+    )
+
+    # compare currentModel (as best so far) to FALSE bestModel, return best
+
+    expect_equal(
+      checkModels(
+        currentModel = bestHolzinger,
+        fitStatistic = 'rmsea',
+        maximize = FALSE,
+        bestFit = fitmeasures(badHolzinger$model.output, 'rmsea'),
+        bestModel = badHolzinger
+      ),
+      bestHolzinger
     )
   }
 )
 
-test_that(
-  "syntaxExtraction creates a valid list", {
-    initialModelSyntaxFile <-"
-f1 =~ Item1 + Item2 + Item3 + Item4 + Item5
-f2 =~ Item6 + Item7 + Item8 + Item9 + Item10
-f3 =~ Item11 + Item12 + Item13 + Item14 + Item15
-f4 =~ Item16 + Item17 + Item18 + Item19 + Item20
-"
-    items <-
-      paste0("Item", c(1:20))
-
-    expectedOutput <-
-      list(
-        'factors' = paste0("f", c(1:4)),
-        'itemsPerFactor' =
-          list(
-            paste0("Item", c(1:5)),
-            paste0("Item", c(6:10)),
-            paste0("Item", c(11:15)),
-            paste0("Item", c(16:20))
-          )
-        )
-
-    expect_equal(
-      object =
-        syntaxExtraction(
-          initialModelSyntaxFile = initialModelSyntaxFile,
-          items = items
-          ),
-      expected =
-        expectedOutput
-    )
-
-    }
-  )
-
+# modelWarningCheck ####
 test_that(
   "modelWarningCheck identifies any warning/error in a model while returning model object", {
     defaultModel <- ' visual  =~ x1 + x2 + x3
@@ -209,81 +619,172 @@ test_that(
   }
 )
 
+# syntaxExtraction ####
 test_that(
-  "checkModels returns the appropriate bestModel depending on the conditions", {
-    # example models
-    bestHolzinger <-
-      list('model.output' =
-             lavaan::lavaan(model =
-             ' visual  =~ x1 + x2 + x3
-             textual =~ x4 + x5 + x6
-             speed   =~ x7 + x8 + x9 ',
-             data = lavaan::HolzingerSwineford1939,
-             auto.var=TRUE,
-             auto.fix.first=TRUE,
-             auto.cov.lv.x=TRUE)
-           )
-    badHolzinger <-
-      list('model.output' =
-             lavaan::lavaan(model =
-               ' visual  =~ x1 + x2 + x3 + x7
-              textual =~ x4 + x5 + x6 + x8 + x9',
-             data = lavaan::HolzingerSwineford1939,
-             auto.var=TRUE,
-             auto.fix.first=TRUE,
-             auto.cov.lv.x=TRUE)
+  "syntaxExtraction creates a valid list", {
+    initialModelSyntaxFile <-"
+f1 =~ Item1 + Item2 + Item3 + Item4 + Item5
+f2 =~ Item6 + Item7 + Item8 + Item9 + Item10
+f3 =~ Item11 + Item12 + Item13 + Item14 + Item15
+f4 =~ Item16 + Item17 + Item18 + Item19 + Item20
+"
+    items <-
+      paste0("Item", c(1:20))
+
+    expectedOutput <-
+      list(
+        'factors' = paste0("f", c(1:4)),
+        'itemsPerFactor' =
+          list(
+            paste0("Item", c(1:5)),
+            paste0("Item", c(6:10)),
+            paste0("Item", c(11:15)),
+            paste0("Item", c(16:20))
+          )
       )
 
-    # models are same, return one of them
     expect_equal(
-      checkModels(
-        currentModel = bestHolzinger,
-        fitStatistic = 'cfi',
-        maximize = TRUE,
-        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
-        bestModel = bestHolzinger
+      object =
+        syntaxExtraction(
+          initialModelSyntaxFile = initialModelSyntaxFile,
+          items = items
         ),
-      bestHolzinger
+      expected =
+        expectedOutput
     )
 
-    # comparing best model to (current) bad model, return best
+  }
+)
+
+# fitWarningCheck ####
+test_that(
+  "fitWarningCheck returns value when working and NA when expr is not valid", {
+    exampleCFI <-
+      0.95
+    exampleChisq <-
+      120
+
+    # normal input/output
     expect_equal(
-      checkModels(
-        currentModel = badHolzinger,
-        fitStatistic = 'cfi',
-        maximize = TRUE,
-        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
-        bestModel = bestHolzinger
-      ),
-      bestHolzinger
+      object =
+        fitWarningCheck(expr = exampleCFI,
+                        maximize = TRUE),
+      expected = exampleCFI
     )
 
-    # comparing (current bad) best model to (new) best model, return best
     expect_equal(
-      checkModels(
-        currentModel = bestHolzinger,
-        fitStatistic = 'cfi',
-        maximize = TRUE,
-        bestFit = fitmeasures(badHolzinger$model.output, 'cfi'),
-        bestModel = badHolzinger
-      ),
-      bestHolzinger
+      object =
+        fitWarningCheck(expr = exampleChisq,
+                        maximize = FALSE),
+      expected = exampleChisq
     )
 
-    # expect the bestModel if the currentModel is improperly specified
+    # error input, maximize
     expect_equal(
-      checkModels(
-        currentModel = "bestHolzinger",
-        fitStatistic = 'cfi',
-        maximize = TRUE,
-        bestFit = fitmeasures(bestHolzinger$model.output, 'cfi'),
-        bestModel = bestHolzinger
-      ),
-      bestHolzinger
+      object =
+        fitWarningCheck(expr = 'exampleNull'/2,
+                        maximize = TRUE),
+      expected = NA
+    )
+
+    # error input, minimize
+    expect_equal(
+      object =
+        fitWarningCheck(expr = 'exampleNull'/2,
+                        maximize = FALSE),
+      expected = NA
     )
   }
 )
 
+# checkModelSpecs ####
 test_that(
-  "check if "
+  "checkModelSpecs returns silent when working, error when not", {
+    # full, correct model specs list
+    lavaanDesc <-
+      list(model.type = "sem",
+           estimator = "ML",
+           ordered = NULL,
+           int.ov.free = TRUE,
+           int.lv.free = FALSE,
+           auto.fix.first = FALSE,
+           std.lv = TRUE,
+           auto.fix.single = TRUE,
+           auto.var = TRUE,
+           auto.cov.lv.x = TRUE,
+           auto.efa = TRUE,
+           auto.th = TRUE,
+           auto.delta = TRUE,
+           auto.cov.y = TRUE)
+
+    # correct model specs list with missing values
+    lavaanErr <-
+      list(model.type = "sem",
+           estimator = "ML",
+           ordered = NULL,
+           int.ov.free = TRUE,
+           std.lv = TRUE,
+           auto.fix.single = TRUE,
+           auto.var = TRUE,
+           auto.cov.lv.x = TRUE,
+           auto.efa = TRUE,
+           auto.th = TRUE,
+           auto.delta = TRUE,
+           auto.cov.y = TRUE)
+
+    expect_silent(
+      checkModelSpecs(lavaanDesc)
+    )
+
+    expect_error(
+      checkModelSpecs(lavaanErr)
+    )
+  }
+)
+
+# fitmeasuresCheck ####
+test_that(
+  "fitmeasuresCheck returns silent when working, error when not", {
+    #when provided correct fitmeasure
+    expect_silent(
+      fitmeasuresCheck('cfi')
+      )
+
+    #when provided incorrect fitmeasure as string
+    expect_error(
+      fitmeasuresCheck('something')
+    )
+
+    #when provided incorrect fitmeasure as not-a-string
+    expect_error(
+      fitmeasuresCheck(2)
+    )
+    }
+  )
+
+# fitStatTestCheck ####
+test_that(
+  "user-defined fit.statistics.test passes validity checks for evaluation", {
+    expect_error(
+      fitStatTestCheck(measures = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)",
+                       test = TRUE),
+      regexp = "logical"
+    )
+
+    expect_error(
+      fitStatTestCheck(measures = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)",
+                       test = 1),
+      regexp = "not given as a character object"
+    )
+
+    expect_false(
+      fitStatTestCheck(measures = c('cfi','tli','rmsea'),
+                       test = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)"),
+    )
+
+    expect_error(
+      fitStatTestCheck(measures = c('cfi','tli','rmsea'),
+                       test = "(cfi >> 0.95)&(tli > 0.95)&(rmsea < 0.06)"),
+    )
+  }
 )

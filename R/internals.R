@@ -221,9 +221,10 @@ randomNeighborFull <-
   function(currentModelObject = currentModel,
            numChanges = numChanges,
            data) {
-    # if (class(currentModelObject) == "list") {
-    #   currentModelObject <- currentModelObject
-    # }
+    if (numChanges < 2) {
+      message("Note: Initial numChanges < 2. Setting numChanges to 2.")
+      numChanges <- 2
+    }
 
     # using lavaan functions, construct a full parameter table
     paramTable <- lavaan::parTable(currentModelObject)

@@ -227,8 +227,6 @@ randomNeighborFull <-
 
     # using lavaan functions, construct a full parameter table
     paramTable <- lavaan::parTable(currentModelObject)
-    # fullParamTable <- lavaan:::lav_partable_full(paramTable)
-    # currentModelParams <- lavaan::lav_partable_merge(paramTable, fullParamTable, remove.duplicated = TRUE, warn = FALSE)
 
     # select the rows that correspond to parameters related to the latent variables
     latentVariables <-
@@ -245,29 +243,6 @@ randomNeighborFull <-
     # make the changes by shifting rhs up one row (overflow to bottom)
     paramTable$rhs[randomChangesRows] <-
       paramTable$rhs[randomChangesRows][c(2:numChanges, 1)]
-
-    # flip a coin to decide if a lhs should change
-    # choose only from t
-    # randomLHS <-
-    #   sample(x = c(T,F), 1)
-    # if (randomLHS) {
-    # whichPossibleLHS <-
-    #   table(currentModelParamsLV$lhs)
-    #
-    # whichPossibleLHS <-
-    #   names(which(whichPossibleLHS > 3))
-    # whichLHSrows <-
-    #   currentModelParamsLV$id[currentModelParamsLV$lhs %in% whichPossibleLHS]
-    # # randomly select rows to make changes to
-    # randomChangesRows <-
-    #   sample(whichLHSrows, size = numChanges)
-    # changeParamTable <- paramTable[randomChangesRows, ]
-    #
-    # # make the changes by shifting rhs up one row (overflow to bottom)
-    # paramTable$lhs[randomChangesRows] <-
-    #   paramTable$lhs[randomChangesRows][c(2:numChanges,1)]
-
-    # }
 
     # flip a coin to decide if an item should be added to a 3-item
     currentModelParamsLV <-
@@ -305,7 +280,6 @@ randomNeighborFull <-
     # refit the model
     prevModel <- as.list(currentModelObject@call)
     prevModel$model <- paramTable
-    # randomNeighborModel <- try(do.call(eval(parse(text = "lavaan::lavaan")), prevModel[-1]), silent = TRUE)
 
     randomNeighborModel <- modelWarningCheck(lavaan::lavaan(model = prevModel$model,
                                                             data = data),
@@ -453,6 +427,7 @@ checkModels <-
     if (is.null(currentModel)) {
       return(bestModel)
     }
+
     currentFit <- fitWarningCheck(
       lavaan::fitmeasures(object = currentModel$model.output, fit.measures = fitStatistic),
       maximize
@@ -474,7 +449,6 @@ checkModels <-
         }
       }
     }
-
     return(bestModel)
   }
 

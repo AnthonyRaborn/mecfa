@@ -667,17 +667,27 @@ fitStatTestCheck <-
                     envir = tempEnv),
         error = function(e) {
           stop(
-            "There was a problem with the fit.statistics.test provided. It cannot be evaluated properly. Please read the function documentation to see how to properly specify a test."
+            "There was a problem with the fit.statistics.test provided.
+            It cannot be evaluated properly.
+            Please read the function documentation to see how to properly specify a test."
           )
         }
       )
 
-    if (!is.character(test)) {
+    if (!is.character(test)&is.logical(test)) {
       stop(
-        "There is a problem with the fit.statistics.test provided. The fit.statistics.test was given as a logical, not a character. Please read the function documentation to see how to properly specify a test. "
+        "There is a problem with the fit.statistics.test provided.
+        The fit.statistics.test was given as a logical, not a character.
+        Please read the function documentation to see how to properly specify a test."
+      )
+    } else if (!is.character(test)) {
+      stop(
+        "There is a problem with the fit.statistics.test provided.
+        The fit.statistics.test was not given as a character object.
+        Please read the function documentation to see how to properly specify a test."
       )
     }
-
+    checkIfEval
   }
 
 utils::globalVariables(

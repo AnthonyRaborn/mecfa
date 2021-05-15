@@ -391,9 +391,178 @@ test_that(
   }
 )
 # selectionFunction ####
+test_that(
+  "selectionFunction accurately chooses between the best of two models", {
+    currentModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+            ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9'
+      )
+    intermediateModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+          ' visual  =~ x1 + x2 + x4
+            textual =~ x3 + x5 + x7
+            speed   =~ x6 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x4
+            textual =~ x3 + x5 + x7
+            speed   =~ x6 + x8 + x9'
+      )
+    currentBadModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+            ' visual  =~ x1 + x2 + x3 + x4 + x5 + x6
+            textual =~ x4 + x5 + x6 + x7 + x8 + x9
+            speed   =~ x7 + x8 + x9 + x1 + x2 + x3',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3 + x4 + x5 + x6
+            textual =~ x4 + x5 + x6 + x7 + x8 + x9
+            speed   =~ x7 + x8 + x9 + x1 + x2 + x3'
+      )
+    currentTemp <-
+      0.5
 
+    # new model does not converge, so return currentModelObject with message
+    expect_equal(
+      selectionFunction(
+        currentModelObject = currentModel,
+        randomNeighborModel = currentBadModel,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      currentModel
+    )
+    expect_output(
+      selectionFunction(
+        currentModelObject = currentModel,
+        randomNeighborModel = currentBadModel,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      "New model did not converge."
+    )
+
+    # old model is null, so return the new model
+    expect_equal(
+      selectionFunction(
+        currentModelObject = NULL,
+        randomNeighborModel = currentBadModel,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      currentBadModel
+    )
+
+    # new model is null, so return the old
+    expect_equal(
+      selectionFunction(
+        currentModelObject = currentModel,
+        randomNeighborModel = NULL,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      currentModel
+    )
+
+    # choosing between current model with better fit than new model, prints message with probability
+    expect_output(
+      selectionFunction(
+        currentModelObject = currentModel,
+        randomNeighborModel = intermediateModel,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      "Probability:"
+    )
+
+    # choosing between current model with worse fit than new model, prints message WITHOUT probability
+    expect_output(
+      selectionFunction(
+        currentModelObject = intermediateModel,
+        randomNeighborModel = currentModel,
+        currentTemp = currentTemp,
+        maximize = TRUE,
+        fitStatistic = "cfi",
+        consecutive = 1
+      ),
+      "^((?!Probability:))",
+      perl = TRUE
+    )
+
+  }
+)
 # consecutiveRestart ####
+test_that(
+  "consecutiveRestart produces the correct model depending on the value of consecutive", {
+    # currently not really testing due to how consecutiveRestart is working
+    bestModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+            ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9'
+      )
+    currentModel <-
+      testedModel <-
+      modelWarningCheck(
+        lavaan::cfa(
+          model =
+          ' visual  =~ x1 + x2 + x4
+            textual =~ x3 + x5 + x7
+            speed   =~ x6 + x8 + x9',
+          data = lavaan::HolzingerSwineford1939
+        ),
+        modelSyntax =
+          ' visual  =~ x1 + x2 + x4
+            textual =~ x3 + x5 + x7
+            speed   =~ x6 + x8 + x9'
+      )
+    consecutive = 1
 
+    # consecutive < maxConsecutiveSelection, do not replace currentModel
+    expect_false(
+      c(
+        consecutiveRestart(
+          maxConsecutiveSelection = 25,
+          consecutive = 1
+          ), identical(currentModel, bestModel)
+      )
+    )
+  }
+)
 # checkModels ####
 test_that(
   "checkModels returns the appropriate bestModel depending on the conditions", {

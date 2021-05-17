@@ -75,7 +75,7 @@ ecfaSA <-
            bifactor = FALSE,
            ...) {
     #### initial values ####
-    if(!exists('originalData')) {
+    if(!is.data.frame(originalData)) {
       stop("Please check that you have included the original data frame!")
     }
     allFit <- c()

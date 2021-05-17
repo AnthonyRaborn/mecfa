@@ -27,7 +27,7 @@ ecfaSA(
 )
 }
 \arguments{
-\item{initialModel}{The initial model as a \code{character} vector with lavaan model.syntax.}
+\item{initialModel}{The initial model as a \code{lavaan} object.}
 
 \item{originalData}{The original \code{data.frame} with variable names.}
 

@@ -5,6 +5,10 @@ date: '`r Sys.Date()`'
 output: github_document
 ---
 
+[![Build Status](https://travis-ci.org/AnthonyRaborn/mecfa.svg?branch=stable)](https://travis-ci.org/AnthonyRaborn/mecfa)
+[![codecov](https://codecov.io/gh/AnthonyRaborn/mecfa/branch/stable/graph/badge.svg?token=WSCSO01ROR)](https://codecov.io/gh/AnthonyRaborn/mecfa)
+
+
 `r start.time <- Sys.time()`
 
 # mecfa: Metaheuristic Exploratory/Confirmatory Factor Analysis
@@ -84,7 +88,7 @@ cat(
 
 ```{r function-specifications}
 maxSteps <-
-  500
+  750
 fitStatistic <-
   "rmsea"
 maximize <-

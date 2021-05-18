@@ -3,6 +3,10 @@ mecfa README
 Anthony Raborn
 2021-05-18
 
+[![Build
+Status](https://travis-ci.org/AnthonyRaborn/mecfa.svg?branch=stable)](https://travis-ci.org/AnthonyRaborn/mecfa)
+[![codecov](https://codecov.io/gh/AnthonyRaborn/mecfa/branch/stable/graph/badge.svg?token=WSCSO01ROR)](https://codecov.io/gh/AnthonyRaborn/mecfa)
+
 # mecfa: Metaheuristic Exploratory/Confirmatory Factor Analysis
 
 An R package which utilizes metaheuristic algorithms to simultaneously
@@ -123,7 +127,7 @@ cat(
 
 ``` r
 maxSteps <-
-  500
+  750
 fitStatistic <-
   "rmsea"
 maximize <-
@@ -190,7 +194,7 @@ example
 ```
 
     ## ECFA Algorithm: Simulated Annealing
-    ## Total Run Time: 3.986 mins
+    ## Total Run Time: 5.809 mins
     ## ECFA Function Call:
     ## exploratorySA(initialModels = initialModels, originalData = testData, maxSteps =
     ##   maxSteps, fitStatistic = fitStatistic, maximize = maximize, lavaan.model.specs
@@ -202,38 +206,40 @@ example
     ##   ordered, int.ov.free = int.ov.free, int.lv.free = int.lv.free, auto.fix.first
     ##   = auto.fix.first, std.lv = std.lv, auto.fix.single = auto.fix.single, auto.var
     ##   = auto.var, auto.cov.lv.x = auto.cov.lv.x, auto.efa = auto.efa, auto.th =
-    ##   auto.th, auto.delta = auto.delta, auto.cov.y = auto.cov.y), originalData =
-    ##   originalData, maxSteps = maxSteps, fitStatistic = fitStatistic, temperature
-    ##   = temperature, maximize = maximize, Kirkpatrick = Kirkpatrick, randomNeighbor
-    ##   = randomNeighbor, lavaan.model.specs = lavaan.model.specs, maxChanges
-    ##   = maxChanges, restartCriteria = restartCriteria, maximumConsecutive =
-    ##   maximumConsecutive, bifactor = bifactor)
+    ##   auto.th, auto.delta = auto.delta, auto.cov.y = auto.cov.y, missing = missing),
+    ##   originalData = originalData, maxSteps = maxSteps, fitStatistic = fitStatistic,
+    ##   temperature = temperature, maximize = maximize, Kirkpatrick = Kirkpatrick,
+    ##   randomNeighbor = randomNeighbor, lavaan.model.specs = lavaan.model.specs,
+    ##   maxChanges = maxChanges, restartCriteria = restartCriteria, maximumConsecutive
+    ##   = maximumConsecutive, bifactor = bifactor)
     ## 
     ## Final Model Syntax:
-    ## speed =~ x7 + x8 + x9
-    ## textual =~ x1 + x2 + x3
-    ## visual =~ x4 + x5 + x6
-    ## textual ~~ speed
-    ## visual ~~ speed + textual
-    ## Best Model Fit Using rmsea: 0.092
+    ## accuracy =~ x4 + x5 + x6
+    ## speed =~ x1 + x2
+    ## textual =~ x7 + x8
+    ## visual =~ x3 + x9
+    ## speed ~~ accuracy
+    ## textual ~~ accuracy + speed
+    ## visual ~~ accuracy + speed + textual
+    ## Best Model Fit Using rmsea: 0.086
 
 ``` r
 # summary method
 summary(example)
 ```
 
-    ## lavaan 0.6-8 ended normally after 20 iterations
+    ## lavaan 0.6-8 ended normally after 28 iterations
     ## 
     ##   Estimator                                         ML
     ##   Optimization method                           NLMINB
-    ##   Number of model parameters                        21
+    ##   Number of model parameters                        24
     ##                                                       
     ##   Number of observations                           301
     ##                                                       
     ## Model Test User Model:
     ##                                                       
-    ##   Test statistic                                85.306
-    ##   Degrees of freedom                                24
+    ##   Test statistic                                68.168
+    ##   Degrees of freedom                                21
     ##   P-value (Chi-square)                           0.000
     ## 
     ## Parameter Estimates:
@@ -244,41 +250,47 @@ summary(example)
     ## 
     ## Latent Variables:
     ##                    Estimate  Std.Err  z-value  P(>|z|)
+    ##   accuracy =~                                         
+    ##     x4                0.990    0.057   17.487    0.000
+    ##     x5                1.102    0.063   17.598    0.000
+    ##     x6                0.916    0.054   17.068    0.000
     ##   speed =~                                            
-    ##     x7                0.619    0.070    8.903    0.000
-    ##     x8                0.731    0.066   11.090    0.000
-    ##     x9                0.670    0.065   10.305    0.000
+    ##     x1                0.821    0.088    9.291    0.000
+    ##     x2                0.496    0.076    6.516    0.000
     ##   textual =~                                          
-    ##     x1                0.900    0.081   11.128    0.000
-    ##     x2                0.498    0.077    6.429    0.000
-    ##     x3                0.656    0.074    8.817    0.000
+    ##     x7                0.658    0.076    8.647    0.000
+    ##     x8                0.813    0.079   10.299    0.000
     ##   visual =~                                           
-    ##     x4                0.990    0.057   17.474    0.000
-    ##     x5                1.102    0.063   17.576    0.000
-    ##     x6                0.917    0.054   17.082    0.000
+    ##     x3                0.585    0.072    8.127    0.000
+    ##     x9                0.639    0.067    9.521    0.000
     ## 
     ## Covariances:
     ##                    Estimate  Std.Err  z-value  P(>|z|)
+    ##   speed ~~                                            
+    ##     accuracy          0.547    0.076    7.224    0.000
     ##   textual ~~                                          
-    ##     speed             0.471    0.073    6.461    0.000
+    ##     accuracy          0.208    0.071    2.926    0.003
+    ##     speed             0.302    0.091    3.310    0.001
     ##   visual ~~                                           
-    ##     speed             0.283    0.069    4.117    0.000
-    ##     textual           0.459    0.064    7.189    0.000
+    ##     accuracy          0.375    0.080    4.654    0.000
+    ##     speed             1.001    0.105    9.505    0.000
+    ##     textual           0.710    0.085    8.332    0.000
     ## 
     ## Variances:
     ##                    Estimate  Std.Err  z-value  P(>|z|)
+    ##     accuracy          1.000                           
     ##     speed             1.000                           
     ##     textual           1.000                           
     ##     visual            1.000                           
-    ##    .x1                0.549    0.114    4.833    0.000
-    ##    .x2                1.134    0.102   11.146    0.000
-    ##    .x3                0.844    0.091    9.317    0.000
-    ##    .x4                0.371    0.048    7.779    0.000
-    ##    .x5                0.446    0.058    7.642    0.000
-    ##    .x6                0.356    0.043    8.277    0.000
-    ##    .x7                0.799    0.081    9.823    0.000
-    ##    .x8                0.488    0.074    6.573    0.000
-    ##    .x9                0.566    0.071    8.003    0.000
+    ##    .x1                0.684    0.123    5.577    0.000
+    ##    .x2                1.136    0.101   11.269    0.000
+    ##    .x3                0.932    0.089   10.520    0.000
+    ##    .x4                0.371    0.048    7.788    0.000
+    ##    .x5                0.445    0.058    7.640    0.000
+    ##    .x6                0.358    0.043    8.316    0.000
+    ##    .x7                0.750    0.091    8.281    0.000
+    ##    .x8                0.360    0.106    3.389    0.001
+    ##    .x9                0.607    0.073    8.257    0.000
 
 ``` r
 # plot method
@@ -287,4 +299,4 @@ plot(example)
 
 ![](README_files/figure-gfm/investigate-results-1.png)<!-- -->
 
-It took a total of 4 mins to compile this document.
+It took a total of 5.83 mins to compile this document.

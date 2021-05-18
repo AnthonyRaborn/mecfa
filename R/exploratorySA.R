@@ -118,7 +118,7 @@ setMethod('plot',
               }
               legend(
                 par()$usr[2], par()$usr[4],
-                legend = paste0("Factors: ", 1:ncol(temp)),
+                legend = paste0("Factors: ", 2:(ncol(temp)+1)),
                 col = availableColors[1:ncol(temp)],
                 lty = 1,
                 bty = 'n',

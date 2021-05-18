@@ -61,7 +61,7 @@ setMethod('show',
               ": ",
               round(result@best_fit, 3)
             )
-            to_console = paste0(c(line0, line1, line2, line3, line4, line5),
+            to_console = paste0(c(line0, line1, line2, line3, line4, line5, "\n"),
                                 collapse = "\n")
             cat(to_console)
           }

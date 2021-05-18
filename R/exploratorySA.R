@@ -8,6 +8,7 @@ setClass("exploratorySA",
            list(
              totalTime = 'ANY',
              functionCall = 'call',
+             modelArgs = 'list',
              modelResults = 'list'
            )
 )
@@ -277,6 +278,7 @@ exploratorySA <-
       new('exploratorySA',
           totalTime = Sys.time()-startTime,
           functionCall = match.call(),
+          modelArgs = allArgs(),
           modelResults = chainResults
       )
     results

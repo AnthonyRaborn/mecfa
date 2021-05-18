@@ -19,7 +19,7 @@
 #' * bestGoal -- the best value of the goal function achieved so far
 #' * restartCriteria -- if utilized, this would "restart" the SA process by changing currentModel to bestModel and continuing the process. Could be based on (1) the currentStep value, (2) the difference between goal(currentModel) and goal(bestModel), (3) randomness (i.e., could randomly restart, could randomly restart based on some values, etc), (4) other critera.
 #'
-#' @param initialModel The initial model as a `character` vector with lavaan model.syntax.
+#' @param initialModel The initial model as a `lavaan` object.
 #' @param originalData The original `data.frame` with variable names.
 #' @param maxSteps The number of iterations for which the algorithm will run.
 #' @param fitStatistic Either a single model fit statistic produced by lavaan, or a user-defined fit statistic function.
@@ -76,7 +76,7 @@ ecfaSA <-
            bifactor = FALSE,
            ...) {
     #### initial values ####
-    if(!exists('originalData')) {
+    if(!is.data.frame(originalData)) {
       stop("Please check that you have included the original data frame!")
     }
     allFit <- c()

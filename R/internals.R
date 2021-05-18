@@ -222,14 +222,13 @@ randomNeighborFull <-
   function(currentModelObject = currentModel,
            numChanges = numChanges,
            data) {
-    # if (class(currentModelObject) == "list") {
-    #   currentModelObject <- currentModelObject
-    # }
+    if (numChanges < 2) {
+      message("Note: Initial numChanges < 2. Setting numChanges to 2.")
+      numChanges <- 2
+    }
 
     # using lavaan functions, construct a full parameter table
     paramTable <- lavaan::parTable(currentModelObject)
-    # fullParamTable <- lavaan:::lav_partable_full(paramTable)
-    # currentModelParams <- lavaan::lav_partable_merge(paramTable, fullParamTable, remove.duplicated = TRUE, warn = FALSE)
 
     # select the rows that correspond to parameters related to the latent variables
     latentVariables <-
@@ -246,29 +245,6 @@ randomNeighborFull <-
     # make the changes by shifting rhs up one row (overflow to bottom)
     paramTable$rhs[randomChangesRows] <-
       paramTable$rhs[randomChangesRows][c(2:numChanges, 1)]
-
-    # flip a coin to decide if a lhs should change
-    # choose only from t
-    # randomLHS <-
-    #   sample(x = c(T,F), 1)
-    # if (randomLHS) {
-    # whichPossibleLHS <-
-    #   table(currentModelParamsLV$lhs)
-    #
-    # whichPossibleLHS <-
-    #   names(which(whichPossibleLHS > 3))
-    # whichLHSrows <-
-    #   currentModelParamsLV$id[currentModelParamsLV$lhs %in% whichPossibleLHS]
-    # # randomly select rows to make changes to
-    # randomChangesRows <-
-    #   sample(whichLHSrows, size = numChanges)
-    # changeParamTable <- paramTable[randomChangesRows, ]
-    #
-    # # make the changes by shifting rhs up one row (overflow to bottom)
-    # paramTable$lhs[randomChangesRows] <-
-    #   paramTable$lhs[randomChangesRows][c(2:numChanges,1)]
-
-    # }
 
     # flip a coin to decide if an item should be added to a 3-item
     currentModelParamsLV <-
@@ -306,7 +282,6 @@ randomNeighborFull <-
     # refit the model
     prevModel <- as.list(currentModelObject@call)
     prevModel$model <- paramTable
-    # randomNeighborModel <- try(do.call(eval(parse(text = "lavaan::lavaan")), prevModel[-1]), silent = TRUE)
 
     randomNeighborModel <- modelWarningCheck(lavaan::lavaan(model = prevModel$model,
                                                             data = data),
@@ -454,10 +429,16 @@ checkModels <-
     if (is.null(currentModel)) {
       return(bestModel)
     }
+
     currentFit <- fitWarningCheck(
       lavaan::fitmeasures(object = currentModel$model.output, fit.measures = fitStatistic),
       maximize
     )
+
+    if (is.na(currentFit)) {
+      return(bestModel)
+    }
+
     if (maximize == TRUE) {
       if (currentFit > bestFit) {
         bestModel <- currentModel
@@ -468,14 +449,9 @@ checkModels <-
       if (currentFit < bestFit) {
         bestModel <- currentModel
       } else {
-        if (currentFit < bestFit) {
-          bestModel <- currentModel
-        } else {
-          bestModel <- bestModel
-        }
+        bestModel <- bestModel
       }
     }
-
     return(bestModel)
   }
 
@@ -544,11 +520,7 @@ fitWarningCheck <-
     value <- withCallingHandlers(tryCatch(
       expr,
       error = function(e) {
-        if (maximize == T) {
-          return(0)
-        } else {
-          return(Inf)
-        }
+        return(NA)
         invokeRestart("muffleWarning")
       }
     ))
@@ -694,18 +666,58 @@ fitStatTestCheck <-
                     envir = tempEnv),
         error = function(e) {
           stop(
-            "There was a problem with the fit.statistics.test provided. It cannot be evaluated properly. Please read the function documentation to see how to properly specify a test."
+            "There was a problem with the fit.statistics.test provided.
+            It cannot be evaluated properly.
+            Please read the function documentation to see how to properly specify a test."
           )
         }
       )
 
-    if (!is.character(test)) {
+    if (!is.character(test)&is.logical(test)) {
       stop(
-        "There is a problem with the fit.statistics.test provided. The fit.statistics.test was given as a logical, not a character. Please read the function documentation to see how to properly specify a test. "
+        "There is a problem with the fit.statistics.test provided.
+        The fit.statistics.test was given as a logical, not a character.
+        Please read the function documentation to see how to properly specify a test."
+      )
+    } else if (!is.character(test)) {
+      stop(
+        "There is a problem with the fit.statistics.test provided.
+        The fit.statistics.test was not given as a character object.
+        Please read the function documentation to see how to properly specify a test."
       )
     }
-
+    checkIfEval
   }
+
+# allArgs ####
+allArgs <- function(orig_values = FALSE) {
+  # source: https://stackoverflow.com/a/47955845
+  # get formals for parent function
+  parent_formals <- formals(sys.function(sys.parent(n = 1)))
+
+  # Get names of implied arguments
+  fnames <- names(parent_formals)
+
+  # Remove '...' from list of parameter names if it exists
+  fnames <- fnames[-which(fnames == '...')]
+
+  # Get currently set values for named variables in the parent frame
+  args <- evalq(as.list(environment()), envir = parent.frame())
+
+  # Get the list of variables defined in '...'
+  args <- c(args[fnames], evalq(list(...), envir = parent.frame()))
+
+
+  if(orig_values) {
+    # get default values
+    defargs <- as.list(parent_formals)
+    defargs <- defargs[unlist(lapply(defargs, FUN = function(x) class(x) != "name"))]
+    args[names(defargs)] <- defargs
+    setargs <- evalq(as.list(match.call())[-1], envir = parent.frame())
+    args[names(setargs)] <- setargs
+  }
+  return(args)
+}
 
 utils::globalVariables(
   c(

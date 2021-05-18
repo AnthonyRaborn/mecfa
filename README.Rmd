@@ -1,0 +1,146 @@
+---
+title: 'mecfa README'
+author: Anthony Raborn
+date: '`r Sys.Date()`'
+output: github_document
+---
+
+`r start.time <- Sys.time()`
+
+# mecfa: Metaheuristic Exploratory/Confirmatory Factor Analysis
+
+An R package which utilizes metaheuristic algorithms to simultaneously find the 
+best-fitting model for various factor structures and select which factor 
+structure has the highest fit. Currently, simulated annealing is the only 
+metaheuristic algorithm in use, but ant colony optimization may be incorporated 
+in the future.
+
+# Installation
+
+To install this package, you must have `devtools` installed! It is only found on
+GitHub at the moment. 
+
+```{r installing-mecfa, eval=FALSE}
+require(devtools)
+devtools::install_github("AnthonyRaborn/mecfa") # automatically installs stable branch
+```
+
+# Usage
+
+The goal of `mecfa` is to find the best-fitting confirmatory factor analysis
+from a range of possible latent factors. 
+(If you are unsure of what this means, [here is an article which talks about the basics](https://stats.idre.ucla.edu/spss/seminars/introduction-to-factor-analysis/a-practical-introduction-to-factor-analysis-confirmatory-factor-analysis/)). 
+It fits these CFA models using the `lavaan` software.
+
+To start, you need a dataset, some initial models, and the `mecfa` package.
+
+## System Information
+
+```{r system-information}
+sessionInfo()
+```
+
+## Data
+
+```{r usage-data}
+library(mecfa)
+
+# sample data to use
+testData <-
+  lavaan::HolzingerSwineford1939
+```
+
+The `lavaan` Holzinger-Swineford dataset is a 9-item test of mental ability for 
+7th and 8th-grade children.
+It also includes other variables which may be of interest for structural equation
+modeling, but we will ignore these for now.
+
+The test items are labeled `x1` thru `x9`, so we can use these as our item names
+when we create the different initial models.
+While the generally-accepted model has 3 factors, we will investigate 2, 3, and 
+4 factors for this example.
+
+## Initial Models
+
+```{r usage-initial-models}
+factorsNames <-
+  c("visual", "textual", "speed", "accuracy")
+itemNames <-
+  paste0("x", 1:9)
+initialModels <-
+  createInitialModels(
+    maxFactors = factorsNames,
+    items = itemNames)
+    
+cat(
+  paste(
+    initialModels,
+    collapse = "\n\n"
+  )
+)
+```
+
+## Function Specifications
+
+```{r function-specifications}
+maxSteps <-
+  500
+fitStatistic <-
+  "rmsea"
+maximize <-
+  FALSE
+lavaan.model.specs <-
+  list(
+    model.type = "cfa", 
+    auto.var = TRUE, 
+    estimator = "default",
+    ordered = NULL,
+    int.ov.free = TRUE, 
+    int.lv.free = FALSE, 
+    std.lv = TRUE, 
+    auto.fix.first = FALSE, 
+    auto.fix.single = TRUE, 
+    auto.cov.lv.x = TRUE, 
+    auto.th = TRUE, 
+    auto.delta = TRUE, 
+    auto.cov.y = TRUE,
+    auto.efa = TRUE,
+    missing = "listwise"
+    )
+maxChanges <-
+  2
+temperatureFunction <-
+  "quadratic"
+```
+
+
+## Execute Function
+
+```{r execute-function}
+example <-
+  exploratorySA(
+    initialModels = initialModels,
+    originalData = testData,
+    maxSteps = maxSteps,
+    fitStatistic = fitStatistic,
+    maximize = maximize,
+    lavaan.model.specs = lavaan.model.specs,
+    temperature = temperatureFunction
+  )
+```
+
+## Investigate Results
+
+```{r investigate-results}
+# show/print method
+example
+
+# summary method
+summary(example)
+
+# plot method
+plot(example)
+```
+
+It took a total of `r round(as.difftime(Sys.time() - start.time, units = "mins"),2)` `r attr(round(as.difftime(Sys.time() - start.time, units = "mins"),2), 'units')` to compile this document.
+

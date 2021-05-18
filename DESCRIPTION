@@ -18,7 +18,6 @@ Suggests:
     rmarkdown,
     testthat
 Imports:
-    lavaan (>= 0.5-22),
     ggplot2,
     tidyr,
     stringr,
@@ -26,4 +25,5 @@ Imports:
     foreach,
     methods
 Depends:
-    R (>= 4.0.0)
+    R (>= 4.0.0),
+    lavaan (>= 0.5-22)

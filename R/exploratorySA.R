@@ -108,7 +108,7 @@ setMethod('plot',
               bty = "L",
               main = "Model Fit Results per # of Factors",
               ylab = paste0("Fit Statistic: ",
-                            as.list(x@functionCall)[-1]$fitStatistic),
+                            x@modelArgs$fitStatistic),
               xlab = "Step"
             )
 

@@ -34,6 +34,12 @@ It fits these CFA models using the `lavaan` software.
 
 To start, you need a dataset, some initial models, and the `mecfa` package.
 
+## System Information
+
+```{r system-information}
+sessionInfo()
+```
+
 ## Data
 
 ```{r usage-data}
@@ -136,4 +142,5 @@ summary(example)
 plot(example)
 ```
 
-`r round(as.difftime(Sys.time() - start.time, format = "%M:%S"),2)`
+It took a total of `r round(as.difftime(Sys.time() - start.time, units = "mins"),2)` `r attr(round(as.difftime(Sys.time() - start.time, units = "mins"),2), 'units')` to compile this document.
+

@@ -9,11 +9,11 @@ bestECFA <-
     max <-
       ifelse(
         is.null(
-          object@functionCall$maximize
+          object@modelArgs$maximize
         ),
         TRUE, as.logical(
           as.character(
-            object@functionCall$maximize
+            object@modelArgs$maximize
           )
         )
       )

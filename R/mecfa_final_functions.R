@@ -23,7 +23,7 @@ bestECFA <-
     results <-
       object@modelResults
     if (length(results) > 1) {
-      for (i in 1:(length(results)-1)) {
+      for (i in 1:length(results)) {
         all_final_fit[i] <-
           results[[i]]@best_fit
       }

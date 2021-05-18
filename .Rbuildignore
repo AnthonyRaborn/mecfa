@@ -3,3 +3,4 @@
 ^note*
 ^\.pdf$
 ^Revisiting the Model Size Effect in Structural Equation Modeling\.pdf$
+.travis.yml

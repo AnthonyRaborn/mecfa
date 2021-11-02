@@ -9,11 +9,11 @@ bestECFA <-
     max <-
       ifelse(
         is.null(
-          object@modelArgs$maximize
+          object@functionCall$maximize
         ),
         TRUE, as.logical(
           as.character(
-            object@modelArgs$maximize
+            object@functionCall$maximize
           )
         )
       )
@@ -22,14 +22,9 @@ bestECFA <-
       c()
     results <-
       object@modelResults
-    if (length(results) > 1) {
-      for (i in 1:length(results)) {
-        all_final_fit[i] <-
-          results[[i]]@best_fit
-      }
-    } else {
-      all_final_fit[1] <-
-        results[[1]]@best_fit
+    for (i in 1:(length(results)-1)) {
+      all_final_fit[i] <-
+        results[[i]]@best_fit
     }
     if (max) {
       results[[which(all_final_fit==max(all_final_fit))[1]]]

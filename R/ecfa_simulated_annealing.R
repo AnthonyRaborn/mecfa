@@ -1,7 +1,7 @@
 #' An adaptation of the simulated annealing algorithm for exploratory psychometric
 #' models.
 #'
-#' @description Simulated annealing mimics the physical process of annealing metals together. [Kirkpatrick et al. (1983)](https://science.sciencemag.org/content/220/4598/671) introduces this analogy and demonstrates its use; the implementation here follows this demonstration closely, with some modifications to make it better suited for psychometric models. Meant for exploratory purposes, e.g., finding the best-suited factor
+#' @description Simulated annealing mimics the physical process of annealing metals together. [Kirkpatrick et al. (1983)](http://science.sciencemag.org/content/220/4598/671) introduces this analogy and demonstrates its use; the implementation here follows this demonstration closely, with some modifications to make it better suited for psychometric models. Meant for exploratory purposes, e.g., finding the best-suited factor
 #' structure given a starting model. This is not meant to be accessed directly!
 #'
 #' @details \strong{Outline of the Pieces of the Simulated Annealing Algorithm}
@@ -19,7 +19,7 @@
 #' * bestGoal -- the best value of the goal function achieved so far
 #' * restartCriteria -- if utilized, this would "restart" the SA process by changing currentModel to bestModel and continuing the process. Could be based on (1) the currentStep value, (2) the difference between goal(currentModel) and goal(bestModel), (3) randomness (i.e., could randomly restart, could randomly restart based on some values, etc), (4) other critera.
 #'
-#' @param initialModel The initial model as a `lavaan` object.
+#' @param initialModel The initial model as a `character` vector with lavaan model.syntax.
 #' @param originalData The original `data.frame` with variable names.
 #' @param maxSteps The number of iterations for which the algorithm will run.
 #' @param fitStatistic Either a single model fit statistic produced by lavaan, or a user-defined fit statistic function.
@@ -66,8 +66,7 @@ ecfaSA <-
              auto.cov.lv.x = TRUE,
              auto.th = TRUE,
              auto.delta = TRUE,
-             auto.cov.y = TRUE,
-             missing = "listwise"
+             auto.cov.y = TRUE
            ),
            maxChanges = 5,
            restartCriteria = "consecutive",
@@ -76,7 +75,7 @@ ecfaSA <-
            bifactor = FALSE,
            ...) {
     #### initial values ####
-    if(!is.data.frame(originalData)) {
+    if(!exists('originalData')) {
       stop("Please check that you have included the original data frame!")
     }
     allFit <- c()
@@ -109,7 +108,6 @@ ecfaSA <-
           auto.cov.y = auto.cov.y,
           ordered = ordered,
           estimator = estimator,
-          missing = missing
         ),
         modelSyntax = lavaan::partable(initialModel)
       )

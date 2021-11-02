@@ -8,7 +8,6 @@ setClass("exploratorySA",
            list(
              totalTime = 'ANY',
              functionCall = 'call',
-             modelArgs = 'list',
              modelResults = 'list'
            )
 )
@@ -61,7 +60,7 @@ setMethod('show',
               ": ",
               round(result@best_fit, 3)
             )
-            to_console = paste0(c(line0, line1, line2, line3, line4, line5, "\n"),
+            to_console = paste0(c(line0, line1, line2, line3, line4, line5),
                                 collapse = "\n")
             cat(to_console)
           }
@@ -81,53 +80,6 @@ setMethod('summary',
             lavaan::summary(result@best_model)
           }
           )
-
-#' Plot method for class `exploratorySA`
-#'
-#' @param x,y An S4 object of class `exploratorySA`.
-#' @param ... Not used.
-#'
-#' @export
-#' @importFrom graphics legend lines par
-#' @importFrom methods slot
-setMethod('plot',
-          signature = 'exploratorySA',
-          definition = function(x, y, ...) {
-
-            temp <- sapply(x@modelResults, slot, "all_fit")
-
-            availableColors <-
-              c("black", "#DF536B", "#61D04F", "#2297E6", "#28E2E5", "#D03AF5", "#EEC21F", "gray62")
-
-            par(oma = c(0,0,0,5))
-            plot(
-              temp[,1],
-              col = availableColors[1],
-              type = 'l',
-              ylim = c(min(temp, na.rm = T), max(temp, na.rm = T)),
-              bty = "L",
-              main = "Model Fit Results per # of Factors",
-              ylab = paste0("Fit Statistic: ",
-                            x@modelArgs$fitStatistic),
-              xlab = "Step"
-            )
-
-            if (2 <= ncol(temp) & ncol(temp) <=8 ) {
-
-              for (i in 2:ncol(temp)) {
-                lines(temp[,i], col = availableColors[i])
-              }
-              legend(
-                par()$usr[2], par()$usr[4],
-                legend = paste0("Factors: ", 2:(ncol(temp)+1)),
-                col = availableColors[1:ncol(temp)],
-                lty = 1,
-                bty = 'n',
-                xpd = NA)
-            }
-          }
-)
-
 
 #' Exploratory CFA using Simulated Annealing
 #'
@@ -169,8 +121,7 @@ exploratorySA <-
              auto.cov.lv.x = TRUE,
              auto.th = TRUE,
              auto.delta = TRUE,
-             auto.cov.y = TRUE,
-             missing = "listwise"
+             auto.cov.y = TRUE
            ),
            maxChanges = 5,
            restartCriteria = "consecutive",
@@ -252,8 +203,7 @@ exploratorySA <-
                                 auto.efa = auto.efa,
                                 auto.th = auto.th,
                                 auto.delta = auto.delta,
-                                auto.cov.y = auto.cov.y,
-                                missing = missing),
+                                auto.cov.y = auto.cov.y),
                              originalData = originalData,
                              maxSteps = maxSteps,
                              fitStatistic = fitStatistic,
@@ -280,7 +230,6 @@ exploratorySA <-
       new('exploratorySA',
           totalTime = Sys.time()-startTime,
           functionCall = match.call(),
-          modelArgs = allArgs(),
           modelResults = chainResults
       )
     results

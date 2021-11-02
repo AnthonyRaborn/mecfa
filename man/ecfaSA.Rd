@@ -17,7 +17,7 @@ ecfaSA(
   lavaan.model.specs = list(model.type = "cfa", auto.var = TRUE, estimator = "default",
     ordered = NULL, int.ov.free = TRUE, int.lv.free = FALSE, std.lv = TRUE,
     auto.fix.first = FALSE, auto.fix.single = TRUE, auto.cov.lv.x = TRUE, auto.th = TRUE,
-    auto.delta = TRUE, auto.cov.y = TRUE, missing = "listwise"),
+    auto.delta = TRUE, auto.cov.y = TRUE),
   maxChanges = 5,
   restartCriteria = "consecutive",
   maximumConsecutive = 25,
@@ -27,7 +27,7 @@ ecfaSA(
 )
 }
 \arguments{
-\item{initialModel}{The initial model as a \code{lavaan} object.}
+\item{initialModel}{The initial model as a \code{character} vector with lavaan model.syntax.}
 
 \item{originalData}{The original \code{data.frame} with variable names.}
 
@@ -65,7 +65,7 @@ CFA. See \link[lavaan]{lavaan} for more details.}
 A named list: the 'bestModel' found, the 'bestFit', and 'allFit' values found by the algorithm.
 }
 \description{
-Simulated annealing mimics the physical process of annealing metals together. \href{https://science.sciencemag.org/content/220/4598/671}{Kirkpatrick et al. (1983)} introduces this analogy and demonstrates its use; the implementation here follows this demonstration closely, with some modifications to make it better suited for psychometric models. Meant for exploratory purposes, e.g., finding the best-suited factor
+Simulated annealing mimics the physical process of annealing metals together. \href{http://science.sciencemag.org/content/220/4598/671}{Kirkpatrick et al. (1983)} introduces this analogy and demonstrates its use; the implementation here follows this demonstration closely, with some modifications to make it better suited for psychometric models. Meant for exploratory purposes, e.g., finding the best-suited factor
 structure given a starting model. This is not meant to be accessed directly!
 }
 \details{
